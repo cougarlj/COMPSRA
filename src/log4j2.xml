@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+
+<Configuration status="INFO">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+        
+        <File name="Log0" fileName="${sys:MyLogFile0}" immediateFlush="false" append="false">
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>  
+        
+<!--        <RollingFile name="Log1" fileName="${sys:MyLogFile1}"
+                      filePattern="${sys:user.home}/logs/$${date:yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log">
+       
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="[%d{HH:mm:ss:SSS}] [%p] - %l - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+        </RollingFile>        -->
+    </Appenders>
+    
+    <Loggers>
+        <Root level="all">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="Log0"/>
+        </Root>
+      
+<!--        <logger name="edu.harvard.channing.circurna.core.qc">
+            <AppenderRef ref="Log1"/>
+        </logger>
+        <logger name="edu.harvard.channing.circurna.core.aln">
+            <AppenderRef ref="Log1"/>
+        </logger>
+        <logger name="edu.harvard.channing.circurna.core.ann">
+            <AppenderRef ref="Log1"/>
+        </logger>
+        <logger name="edu.harvard.channing.circurna.core.mic">
+            <AppenderRef ref="Log1"/>
+        </logger>
+        <logger name="edu.harvard.channing.circurna.core.fun">
+            <AppenderRef ref="Log1"/>
+        </logger>  
+        <logger name="edu.harvard.channing.circurna.db">
+            <AppenderRef ref="Log1"/>
+        </logger>  
+        <logger name="edu.harvard.channing.circurna.toolkit">
+            <AppenderRef ref="Log1"/>
+        </logger>     
+        <logger name="edu.harvard.channing.circurna.utility">
+            <AppenderRef ref="Log1"/>
+        </logger>              -->
+    </Loggers> 
+</Configuration>    
