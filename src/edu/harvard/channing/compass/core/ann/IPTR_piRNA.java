@@ -133,6 +133,7 @@ public class IPTR_piRNA extends IPTR {
                 }
             }                     
             bw.close();
+            LOG.info(this.strOutput+" was saved.");
             
             //For Debug Purpose.
             if (this.needDetail) {

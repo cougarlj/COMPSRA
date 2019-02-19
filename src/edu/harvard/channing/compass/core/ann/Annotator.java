@@ -22,10 +22,11 @@ public abstract class Annotator implements Callable {
     public FileRecord frd;
     public boolean isInCluster=false;
     public float fltOverlap=1;
-    int intTD=1;
+    public int intTD=1;
     public boolean boolRmSamMap=false;
     public boolean boolCR=false;
     public boolean needBAMOutput=false;
+    public boolean boolShowUnAnn=false;
     
     public void setInput(FileRecord frd){
         this.frd=frd;

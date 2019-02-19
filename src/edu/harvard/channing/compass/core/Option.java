@@ -11,8 +11,9 @@ import edu.harvard.channing.compass.core.mic.Microbe;
 import edu.harvard.channing.compass.core.ann.Annotation;
 import edu.harvard.channing.compass.core.aln.Alignment;
 import edu.harvard.channing.compass.core.qc.QualityControl;
-import edu.harvard.channing.compass.entity.Adapter;
+import edu.harvard.channing.compass.toolkit.Adapter;
 import edu.harvard.channing.compass.entity.CommonParameter;
+import edu.harvard.channing.compass.toolkit.CallVariant;
 import edu.harvard.channing.compass.toolkit.DownloadResource;
 import edu.harvard.channing.compass.toolkit.Fasta;
 import edu.harvard.channing.compass.toolkit.SingleAnn;
@@ -72,73 +73,75 @@ public class Option {
         options=new Options();
         
         //Set common options. 
-        options.addOption("h", "help", false, "To display the help info.");
-        options.addOption("in", "input",true,"To set the input file (.fastq)."); //The text, gz, bgzip format are supported. 
-        options.addOption("out", "output", true, "To set the output directory and prefix of output file.");//The prefix of output file is supported. 
-        options.addOption("t", "threads",true, "To set the multithreads mode.");
-        options.addOption("ref", "ref_genome", true, "To set the reference genome.");
-        options.addOption("pro","project_name",true, "Set the project name.");
-        options.addOption("inf","in_file",true,"To read the sample name from a file.");
-        options.addOption("cr","check_resource",false,"To check the resource needed and download online if not existed.");
+        options.addOption("h", "help", false, "Display the help info.");
+        options.addOption("in", "input",true,"Set the input file (.fastq format)."); //The text, gz, bgzip format are supported. 
+        options.addOption("out", "output", true, "Set the output directory and prefix of output file.");//The prefix of output file is supported. 
+        options.addOption("t", "threads",true, "Set the multithreads mode. （The default value is one.）");
+        options.addOption("ref", "ref_genome", true, "Set the reference genome.");
+        options.addOption("pro","project_name",true, "Set the project name. This name will be used when merging a set of files. (Default value is COMPASS)");
+        options.addOption("inf","in_file",true,"Read the sample name from a file.");
+        options.addOption("cr","check_resource",false,"Check the resource needed and download online if not existed.");
         
         
         //Set Quality Control options. 
-        options.addOption("qc","quality_control",false,"TO open the quality control module.");
-        options.addOption("ra", "rm_adapter", true, "To remove adapters.");
-        options.addOption("rb", "rm_bias", true, "To remove the randomized bases at the ligation junctions.");
-        options.addOption("rh", "rm_low_quality_head",true, "To remove bases with low quality from head.");
-        options.addOption("rt", "rm_low_quality_tail", true, "To remove bases with low quality from tail.");
-        options.addOption("rr", "rm_low_quality_read", true, "To remove reads with low quality.");
+        options.addOption("qc","quality_control",false,"Open the quality control module.");
+        options.addOption("ra", "rm_adapter", true, "Remove adapters.");
+        options.addOption("rb", "rm_bias", true, "Remove the randomized bases at the ligation junctions.");
+        options.addOption("rh", "rm_low_quality_head",true, "Remove bases with low quality from head.");
+        options.addOption("rt", "rm_low_quality_tail", true, "Remove bases with low quality from tail.");
+        options.addOption("rr", "rm_low_quality_read", true, "Remove reads with low quality.");
         
-        options.addOption("rhh", "rm_head_hard", true, "To remove N bases of the read directly from the head.");
-        options.addOption("rth", "rm_tail_hard", true, "To remove N bases of the read directly from the tail.");
-        options.addOption("rlh", "rm_read_hard", true, "To remove read with the length smaller(<) than N. ");
+        options.addOption("rhh", "rm_head_hard", true, "Remove N bases of the read directly from the head.");
+        options.addOption("rth", "rm_tail_hard", true, "Remove N bases of the read directly from the tail.");
+        options.addOption("rlh", "rm_read_hard", true, "Remove read with the length smaller(<) than N. ");
         
                 
         //Set Alignment options.
-        options.addOption("aln", "alignment", false, "To open the alignment module.");
-        options.addOption("mt", "mapping_tool", true, "To set the alignment tool used to map reads to the reference genome."); //The default tool for alignment is star.
-        options.addOption("mp","mapping_param",true,"To set the main parameters of the aligner.");
-        options.addOption("midx","mapping_index",true,"To choose the files");//"last" was default, for others are "1,2,4...". 
-        options.addOption("mref","mapping_reference",true,"To set the reference genome for alignment.");
+        options.addOption("aln", "alignment", false, "Open the alignment module.");
+        options.addOption("mt", "mapping_tool", true, "Set the alignment tool used to map reads to the reference genome.(Default value is star.)"); //The default tool for alignment is star.
+        options.addOption("mp","mapping_param",true,"Set the main parameters of the aligner.");
+        options.addOption("midx","mapping_index",true,"Choose the files that were seperated by read length for alignment.(Default value is last, which means the files with the longest reads set.)");//"last" was default, for others are "1,2,4...". 
+        options.addOption("mref","mapping_reference",true,"Set the reference genome for alignment. (Default value is hg38)");
+        options.addOption("mbi","mapping_build_index",false,"Build index for the input reference genome. Only needed in the first run.(This parameter was deprecated.)");
 
         
         //Set Annotation options. 
-        options.addOption("ann", "annotation", false, "To open the annotation module.");
-        options.addOption("ac", "ann_class", true, "To annotate the results of alignment.");//01:miRNA 02:piRNA 03:tRNA 04:snoRNA 05:snRNA 06:circRNA. 
-        options.addOption("aol","ann_overlap",true,"To set the overlap between reads and genes. (Default value is 0.9.)");
-        options.addOption("aic","ann_inCluster",false,"To display piRNAs in the clusters. (Default value is false.)");
-        options.addOption("atd","ann_threshold",true,"To filter the count of reads. (Default value is 1.)");
-        options.addOption("armsm","ann_remove_sam",false,"To remove the sam file with reads mapped to the genome. (Default value is false.)");
-        options.addOption("abam","ann_bam",false,"To outptu bam files for each kind of RNA. (Default value is fasle.)");
+        options.addOption("ann", "annotation", false, "Open the annotation module.");
+        options.addOption("ac", "ann_class", true, "Annotate the results of alignment.");//01:miRNA 02:piRNA 03:tRNA 04:snoRNA 05:snRNA 06:circRNA. 
+        options.addOption("aol","ann_overlap",true,"Set the overlap between reads and genes. (Default value is 0.9.)");
+        options.addOption("aic","ann_inCluster",false,"Display piRNAs in the clusters. (Default value is false.)");
+        options.addOption("atd","ann_threshold",true,"Filter the count of reads. (Default value is 1.)");
+        options.addOption("armsm","ann_remove_sam",false,"Remove the sam file with reads mapped to the genome. (Default value is false.)");
+        options.addOption("abam","ann_bam",false,"Output bam files for each kind of RNA. (Default value is fasle.)");
+        options.addOption("asu","ann_show_unann",false,"Output the alignments without annotations. (Default value is false.)");
         
         //Set Microbe options. 
-        options.addOption("mic","microbe",false,"To open the microbe module.");
-        options.addOption("mtool","mic_tool",true,"To choose the microbe profiling tool used.");//MetaPhlAn, Blast. 
-        options.addOption("mdb","mic_database",true,"To set the databases used.");//(10239:viruses|2:bacteria|4751:fungi|2157:archaea)
+        options.addOption("mic","microbe",false,"Open the microbe module.");
+        options.addOption("mtool","mic_tool",true,"Choose the microbe profiling tool used. (Default value is Blast.)");//MetaPhlAn, Blast. 
+        options.addOption("mdb","mic_database",true,"Set the databases used. (Default value is )");//(10239:viruses|2:bacteria|4751:fungi|2157:archaea)
         
         
         //Set Functional Analysis options. 
-        options.addOption("fun", "function", false, "To open the function module.");
+        options.addOption("fun", "function", false, "Open the function module.");
             //DEG Analysis.
-        options.addOption("fd", "fun_diff_expr", false, "To open the differentially expressed genes analysis.");
-        options.addOption("fdclass","fun_diff_class",true,"To set the RNA classes that will be analyzed."); //01:miRNA 02:piRNA 03:tRNA 04:snoRNA 05:snRNA 06:circRNA. 
-        options.addOption("fdcase","fun_diff_case",true,"To set the case samples.");
-        options.addOption("fdctrl","fun_diff_control",true,"To set the control samples.");
-        options.addOption("fdnorm","fun_diff_normalization",true,"To set the method used in normalization.");
-        options.addOption("fdtest","fun_diff_test",true,"To set the statistical test ued in the DEG analysis.");
-        options.addOption("fdmic","fun_diff_mic",false,"To detect the microbal files. (Used when only apply the functional module.)");
-        options.addOption("fmtool","fun_mtool",true,"To set the tool(s) used in microbial module.");
-        options.addOption("fmdb","fun_mdb",true,"To set the database(s) used in microbial module when blast was applied.");
-        options.addOption("fdann","fun_diff_ann",false,"To detect the annotation files.(Used when only apply the functional module.)");
+        options.addOption("fd", "fun_diff_expr", false, "Open the differentially expressed genes analysis.");
+        options.addOption("fdclass","fun_diff_class",true,"Set the RNA classes that will be analyzed."); //01:miRNA 02:piRNA 03:tRNA 04:snoRNA 05:snRNA 06:circRNA. 
+        options.addOption("fdcase","fun_diff_case",true,"Set the case samples.");
+        options.addOption("fdctrl","fun_diff_control",true,"Set the control samples.");
+        options.addOption("fdnorm","fun_diff_normalization",true,"Set the method used in normalization.(The default method is cpm.)");
+        options.addOption("fdtest","fun_diff_test",true,"Set the statistical test ued in the DEG analysis. (The default test is mwu.)");
+        options.addOption("fdmic","fun_diff_mic",false,"Detect the microbal files. (Used when only apply the functional module.)");
+        options.addOption("fmtool","fun_mtool",true,"Set the tool(s) used in microbial module.");
+        options.addOption("fmdb","fun_mdb",true,"Set the database(s) used in microbial module when blast was applied.");
+        options.addOption("fdann","fun_diff_ann",false,"Detect the annotation files.(Used when only apply the functional module.)");
             //Merge Samples.
-        options.addOption("fm","fun_merge",false,"To merge all the samples according to differet categories.");
+        options.addOption("fm","fun_merge",false,"Merge all the samples according to differet categories.");
         options.addOption("fms","fun_merge_samples",true,"Set samples to be merged.");
         
         //Set Toolkit options.
-        options.addOption("tk","toolkit",false,"To open the toolkit module.");
+        options.addOption("tk","toolkit",false,"Open the toolkit module.");
             //Taxonomy function.
-        options.addOption("tax","taxon",false,"To open the taxonomy sub-module.");
+        options.addOption("tax","taxon",false,"Open the taxonomy sub-module.");
         options.addOption("node","nodeFile",true,"Set the node file from NCBI taxonomy database. (ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdmp.zip)");
         options.addOption("name","nameFile",true,"Set the name file from NCBI taxonomy database. (ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdmp.zip)");
         options.addOption("a2t", "acc2tax", true, "Set the acc2tax index file for nucleotide sequence from NCBI taxonomy database. (ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/nucl_gb.accession2taxid.gz)");
@@ -166,6 +169,15 @@ public class Option {
             //Download Resource.
         options.addOption("dr","download_resource",false,"Open the Download Resource toolkit.");
         options.addOption("ck","check",true,"Check the resources listed. If not existed locally, download them on net.");
+        options.addOption("lr","list",false,"List all URLs of resources in COMPASS.");
+            //ASE function. 
+        options.addOption("ase","allele_specific_expression",false,"Open the ASE function.");
+        options.addOption("sam","sam_input",true,"Set the input sam/bam file.");
+        options.addOption("gm","genome_fasta",true,"Set the input genome reference fasta/fa file.");
+        options.addOption("ref","reference_version",true,"Set the reference genome version."); 
+        options.addOption("inf","in_file",true,"To read the BAM/SAM files from a file.");
+        options.addOption("merge","merge_vt_files",false,"To merge the variant files (*.vt)");
+        options.addOption("out","out_file",true,"To set the output file full name.");
     }
     
     /**
@@ -283,11 +295,36 @@ public class Option {
             }else if(comm.hasOption("dr")){
                 DownloadResource dr=new DownloadResource();
                 
+                if(comm.hasOption("lr")){
+                    dr.boolListResource=true;
+                }
+                
                 if(comm.hasOption("ck")){
                     dr.strResource=comm.getOptionValue("ck");                    
                 }
 
                 ptk.setTK(dr);
+            }else if(comm.hasOption("ase")){
+                CallVariant cv=new CallVariant();
+                if(comm.hasOption("sam")){
+                    cv.strSAM=comm.getOptionValue("sam");
+                }
+                if(comm.hasOption("gm")){
+                    cv.strFa=comm.getOptionValue("gm");
+                }
+                if(comm.hasOption("ref")){
+                    cv.strRefID=comm.getOptionValue("ref");
+                }
+                if(comm.hasOption("inf")){
+                    cv.strFileList=comm.getOptionValue("inf");
+                }
+                if(comm.hasOption("merge")){
+                    cv.needMerge=true;
+                }
+                if(comm.hasOption("out")){
+                    cv.strOut=comm.getOptionValue("out");
+                }
+                ptk.setTK(cv);
             }
             return ptk;
         }        
@@ -322,7 +359,7 @@ public class Option {
         
         if(comm.hasOption("ref")){
             comParam.setRefGenome(comm.getOptionValue("ref"));
-            System.out.println("The "+comParam.strRefGenome+" is set.");
+            System.out.println("The "+comParam.strRefGenome+" reference genome was set.");
         }else{
             comParam.setRefGenome("hg38");           
         }
@@ -331,7 +368,6 @@ public class Option {
             comParam.intThread=Integer.parseInt(comm.getOptionValue("t"));                      
         }else{
             comParam.intThread=1;
-//            System.out.println("Thread Info: The machine has "+Runtime.getRuntime().availableProcessors()+" CPUs.");          
         }
         
         if(comm.hasOption("pro")){
@@ -423,6 +459,10 @@ public class Option {
             }else{
                 align.strIndex="last";
             }
+            
+            if(comm.hasOption("mbi")){
+                align.needIndex=true;
+            }
 //            if (comm.hasOption("mr")) {
 //                align.strRefGenome = comm.getOptionValue("mr");
 //            } else {
@@ -475,6 +515,9 @@ public class Option {
             if(comm.hasOption("abam")){
                 ann.needBAMOutput=true;
             }
+            if(comm.hasOption("asu")){
+                ann.boolShowUnAnn=true;
+            }
             
         } else {
             System.out.println("Annotation module will not be performed.");
@@ -491,7 +534,7 @@ public class Option {
             if(comm.hasOption("mdb")){
                 mic.strBlastDB=comm.getOptionValue("mdb");
             }
-
+            
         }else{
             System.out.println("Microbe module will not be performed.");
         }

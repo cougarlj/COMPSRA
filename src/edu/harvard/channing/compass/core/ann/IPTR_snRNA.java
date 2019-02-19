@@ -45,8 +45,8 @@ public class IPTR_snRNA extends IPTR {
         if(db!=null)   dbtForest.add(db.getForest(this.refGenome));  
    
         //Construct ensembl
-        db=Factory.getDB("ENS_snRNA",this.boolCR);
-        if(db!=null)    dbtForest.add(db.getForest(this.refGenome));
+//        db=Factory.getDB("ENS_snRNA",this.boolCR);
+//        if(db!=null)    dbtForest.add(db.getForest(this.refGenome));
         
         //Other database can be added as follows!
         

@@ -47,7 +47,8 @@ public class Microbe {
         this.showModule();
         
         String message;
-        ExecutorService exe=Executors.newCachedThreadPool();
+//        ExecutorService exe=Executors.newCachedThreadPool();
+        ExecutorService exe=Executors.newFixedThreadPool(this.comParam.intThread);
         ArrayList<Future<String>> lstResult=new ArrayList<Future<String>>();
                               
         String[] strTool = this.strTool.split(",|;");
@@ -71,10 +72,7 @@ public class Microbe {
                         }
                         
                     }
-                }
-
-//                Future<String> future = exe.submit(life);
-//                lstResult.add(future);             
+                }          
             }
         }
   
@@ -105,26 +103,22 @@ public class Microbe {
                 exe.shutdown();
             }
         }       
-               
+        
+
         if(this.strTool.toLowerCase().contains("blast")){
-            this.tomy=new Taxonomy(Configuration.NT.get("names"),Configuration.NT.get("nodes"),Configuration.NT.get("a2t"));
-//            this.tomy.init();
-//            this.tomy.map2tree=true;
+            this.tomy=new Taxonomy(Configuration.NT.get("names"),Configuration.NT.get("nodes"),Configuration.NT.get("A2T"));
             this.tomy.strSurfix[5]="";
             this.tomy.setAcc2Tax(Configuration.NT.get("A2T"));
             this.tomy.init();
             for(MicTool mt:this.altMT){
                 if(mt.getClass().equals(MetaPhlAn.class))   continue;
-//                if(!mt.boolBlast)   continue;
                 this.tomy.strBlastResult=mt.strOutput;                
                 this.tomy.strOut=mt.strOutput.replace(".tmp", ".txt");
                 this.tomy.taxid=this.tomy.ComUse.get(mt.getDB());
                 this.tomy.map2tree();
                 this.tomy.freshTree();
             }
-        }
-        
-//        System.out.println("\n--------------------Microbe-Report-End--------------------\n");
+        }        
         return 1;
     }
     

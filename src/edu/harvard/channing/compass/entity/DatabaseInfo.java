@@ -5,6 +5,7 @@
  */
 package edu.harvard.channing.compass.entity;
 
+import java.io.Serializable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,7 +15,7 @@ import org.apache.logging.log4j.Logger;
  * @version 1.0 
  * @since 2017-08-30
  */
-public class DatabaseInfo {
+public class DatabaseInfo implements Serializable{
     private static final Logger LOG = LogManager.getLogger(DatabaseInfo.class.getName());
     
     //Identification

@@ -33,8 +33,23 @@ public class ProduceTK extends Produce{
      */
     @Override
     public void Dispatch(){   
+        if(this.tk==null){
+           LOG.error("No ToolKit was set!");
+           return;
+        }
+        this.showModule();
         int intFlag=tk.runKit();
-        this.report("ToolKit", intFlag);        
+        this.report("ToolKit", intFlag);  
+        
+    }
+    
+    public void showModule() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n+++++++++++++++++++++++++++++++\n");
+        sb.append("+      COMPASS ---> ToolKit   +");
+        sb.append("\n+++++++++++++++++++++++++++++++\n");
+        System.out.println(sb.toString());
+
     }
   
 }

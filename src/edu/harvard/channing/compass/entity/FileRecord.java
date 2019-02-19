@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,40 +57,69 @@ public class FileRecord {
 //   }
 
     public FileRecord(String strInput) {              
-        this.input=strInput;  
-        File fleInput=new File(strInput);
-        this.input_prefix=fleInput.getName().split("\\.")[0];
+        try {
+            this.input=strInput;
+            File fleInput=new File(strInput);
+            this.input=fleInput.getCanonicalPath();
+            this.input_prefix=fleInput.getName().split("\\.")[0];
+        } catch (IOException ex) {
+            LOG.error(ex.getMessage());
+        }
     }
 
     public void setOutput(String output) {
         File fle = new File(output);
-        if (fle.isDirectory()) {
-            try {
-                this.output_dir = fle.getCanonicalPath() + "/" + this.input_prefix + "/";
-                this.output_prefix = this.input_prefix;
-            } catch (IOException ex) {
-                LOG.error(ex.getMessage());
+        if(!fle.exists()){
+            if (output.endsWith("/") || output.endsWith("\\")) {
+                try {
+                    fle.mkdirs();
+                    this.output_dir = fle.getCanonicalPath()+"/"+ this.input_prefix + "/";
+                    this.output_prefix = this.input_prefix;
+                } catch (IOException ex) {
+                    LOG.error(ex.getMessage());
+                }
+            } else {
+                try {
+                    if(!fle.getParentFile().exists()){
+                        fle.getParentFile().mkdirs();
+                    }                   
+                    this.output_dir = fle.getParentFile().getCanonicalPath() + "/";
+                    this.output_prefix = fle.getName();
+                } catch (IOException ex) {
+                    LOG.error(ex.getMessage());
+                }
             }
         } else {
-            if (fle.getParentFile() == null) {
-                this.output_dir = Configuration.OUTDIR + "/" + this.input_prefix + "/";
-                this.output_prefix = fle.getName();
+            if (fle.isDirectory()) {
+                try {
+                    this.output_dir = fle.getCanonicalPath() + "/" + this.input_prefix + "/";
+                    this.output_prefix = this.input_prefix;
+                } catch (IOException ex) {
+                    LOG.error(ex.getMessage());
+                }
             } else {
-                this.output_dir = fle.getParent() + "/";
-                this.output_prefix = fle.getName();
+                if (fle.getParentFile() == null) {
+                    this.output_dir = Configuration.OUTDIR + "/" + this.input_prefix + "/";
+                    this.output_prefix = fle.getName();
+                } else {
+                    this.output_dir = fle.getParent() + "/";
+                    this.output_prefix = fle.getName();
+                }
             }
         }
-        
-        File fleOut = new File(this.output_dir);
-        if (!fleOut.exists()) {
-            fleOut.mkdirs();
-        }
+
+//        File fleOut = new File(this.output_dir);
+//        if (!fleOut.exists()) {
+//            fleOut.mkdirs();
+//        }
     }
 
     public void setOutput() {
         this.output_dir = Configuration.OUTDIR + "/" + this.input_prefix + "/";
         this.output_prefix = this.input_prefix;
 
+//        System.out.println("Out_Dir: "+this.output_dir);
+        
         File fleOut = new File(this.output_dir);
         if (!fleOut.exists()) {
             fleOut.mkdirs();
@@ -160,13 +190,14 @@ public class FileRecord {
                 this.output_unmap.put(str, str.split("\\.")[0]+Configuration.ANN_OUT[0]);
             }
         }else{
-            //Under this situation, this.input should be the sam file. And -out should give the whole path with prefix. 
+            //Run independently.  
+            String strPrefix=this.output_dir+this.output_prefix;
             this.output_ann.put(this.input, new ArrayList<String>());
             String[] strItem = strAnn.split(",");
             for (String item : strItem) {
-                this.output_ann.get(this.input).add(this.input.split("\\.")[0]+Configuration.ANN_CATEGORY.get(item)+".txt");
+                this.output_ann.get(this.input).add(strPrefix+Configuration.ANN_CATEGORY.get(item)+".txt");
             }
-            this.output_unmap.put(this.input,this.input.split("\\.")[0]+Configuration.ANN_OUT[0]);
+            this.output_unmap.put(this.input,strPrefix+Configuration.ANN_OUT[0]);
         }
     }
     

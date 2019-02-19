@@ -55,7 +55,8 @@ public class Download {
             if(!fleLocal.getParentFile().exists()){
                 fleLocal.getParentFile().mkdirs();
             }
-            FileUtils.copyURLToFile(new URL(this.strTargetURL), new File(this.strLocalFile), 10000, 10000);//10s    
+            FileUtils.copyURLToFile(new URL(this.strTargetURL), new File(this.strLocalFile), 10000, 3600000);//ctm:10s, rtm:1h
+//            FileUtils.copyURLToFile(new URL(this.strTargetURL), new File(this.strLocalFile));
             LOG.info("Finish to download the resource: "+this.strTargetURL);
             
             if (this.needUncompress) {
@@ -68,8 +69,9 @@ public class Download {
                 } else {
                     LOG.info("Couldn't uncompress the file " + strLocalFile);
                 }
+                LOG.info("File "+this.strLocalFile+" was uncompressed.");
             }
-            LOG.info("File "+this.strLocalFile+" was uncompressed.");
+            
         } catch (IOException e) {
             LOG.info("Fail to download the resource: "+this.strTargetURL);
             e.printStackTrace();

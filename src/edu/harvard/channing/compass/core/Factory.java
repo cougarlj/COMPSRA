@@ -19,6 +19,7 @@ import edu.harvard.channing.compass.core.aln.Aligner_BT2;
 import edu.harvard.channing.compass.core.aln.Aligner;
 import edu.harvard.channing.compass.core.aln.Aligner_STAR;
 import edu.harvard.channing.compass.core.aln.Aligner_BT;
+import edu.harvard.channing.compass.core.ann.IPTR_pre_miRNA;
 import edu.harvard.channing.compass.core.ann.TextAnnotator;
 import edu.harvard.channing.compass.core.ann.SAMAnnotator;
 import edu.harvard.channing.compass.core.mic.Blast;
@@ -41,7 +42,10 @@ import edu.harvard.channing.compass.entity.DBLeaf_snRNA;
 import edu.harvard.channing.compass.entity.DBLeaf_snoRNA;
 import edu.harvard.channing.compass.entity.DBLeaf_tRNA;
 import edu.harvard.channing.compass.core.mic.MetaPhlAn;
+import edu.harvard.channing.compass.core.mut.Genome;
+import edu.harvard.channing.compass.core.mut.HumanGenome;
 import edu.harvard.channing.compass.db.DB_Ensembl_snRNA;
+import edu.harvard.channing.compass.db.DB_pre_miRBase;
 import edu.harvard.channing.compass.utility.LimitInputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -226,6 +230,7 @@ public class Factory {
 
     public static IPTR getInterpreter(String strFileName) {
         if(strFileName.contains("_miRNA"))  return new IPTR_miRNA(strFileName);
+        else if(strFileName.contains("_pre-miRNA")) return new IPTR_pre_miRNA(strFileName);
         else if(strFileName.contains("_piRNA")) return new IPTR_piRNA(strFileName);
         else if(strFileName.contains("_snRNA")) return new IPTR_snRNA(strFileName);
         else if(strFileName.contains("_snoRNA")) return new IPTR_snoRNA(strFileName);
@@ -244,7 +249,8 @@ public class Factory {
     
     public static DB getDB(String strName, boolean boolCR){
         switch(strName){
-            case "miRBase": return new DB_miRBase(strName,boolCR);                          
+            case "miRBase": return new DB_miRBase(strName,boolCR);   
+            case "miRBase_pre": return new DB_pre_miRBase(strName,boolCR);
             case "piRNABank": return new DB_piRNABank(strName,boolCR);                           
             case "piRBase": return new DB_piRBase(strName,boolCR);                            
             case "piRNACluster": return new DB_piRNACluster(strName,boolCR);                           
@@ -254,6 +260,13 @@ public class Factory {
             case "GEN_snoRNA": return new DB_GEN_snoRNA(strName,boolCR);
             case "GEN_snRNA": return new DB_GEN_snRNA(strName,boolCR);
             case "ENS_snRNA": return new DB_Ensembl_snRNA(strName,boolCR);
+            default: return null;
+        }
+    }
+    
+    public static Genome getGenome(String strGenome){
+        switch(strGenome){
+            case "hg38": return new HumanGenome(strGenome);
             default: return null;
         }
     }

@@ -63,6 +63,10 @@ public class ReadFile {
                 }
                 while ((strLine = br.readLine()) != null) {
                     String[] strCol = strLine.split("\t");
+                    if(strCol.length<=1){
+                        LOG.warn("The strange line: "+strLine);
+                        continue;
+                    }
                     DBLeaf dif = Factory.createLeaf(key);
                     dif.chr = Configuration.getContig(key, strCol[chr].toLowerCase());
                     dif.start = Integer.parseInt(strCol[start]);
@@ -170,7 +174,11 @@ public class ReadFile {
                 }
                 while ((strLine = br.readLine()) != null) {
                     String[] strCol = strLine.split("\t|,");
-
+                    if (strCol.length <= 1) {
+                        LOG.warn("The strange line: " + strLine);
+                        continue;
+                    }
+                                        
                     Interval itvRegion = new Interval(Configuration.UCSC_CONTIG.get(strCol[chr].toLowerCase()), Integer.parseInt(strCol[start]), Integer.parseInt(strCol[end]), "-".equals(strCol[strand]), strCol[name]);
 //                    System.out.println(itvRegion.toString());
                     Interval itvNew = lorTrans.liftOver(itvRegion);
@@ -279,7 +287,6 @@ public class ReadFile {
     
     /**
      * This function is used to set the UCSC liftover file.
-     *
      * @param db From this version.
      * @param ref To this version.
      * @return The file name of the liftover file used.
@@ -653,7 +660,19 @@ public class ReadFile {
         return hmpK2V;
     }
 
-
+    public static ArrayList<String> readFileList(String f) {
+        BufferedReader br = Factory.getReader(f);
+        ArrayList<String> altFiles=new ArrayList();
+        try {
+            String line;
+            while ((line = br.readLine()) != null) {
+                altFiles.add(line.trim());
+            }
+        } catch (IOException ex) {
+            LOG.error(ex.getMessage());
+        }
+        return altFiles;
+    }
 
 
 }

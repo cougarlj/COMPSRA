@@ -101,17 +101,12 @@ public class Produce {
 //            System.out.println("---------------------------------------");
 //        }
 //        LOG.info("All the processes are runing well!");
-    }
-
-    public void checkResource() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-       
+    }       
     
     public void report(String module,int flag){
         switch (flag) {
             case -1: {
-                LOG.info(module+" module was not performed.\n");
+//                LOG.info(module+" module was not performed.\n");
                 break;
             }
             case 1: {

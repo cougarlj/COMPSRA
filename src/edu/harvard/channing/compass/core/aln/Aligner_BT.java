@@ -36,5 +36,15 @@ public class Aligner_BT extends Aligner {
     public void setRefDB(String strRefDB) {
         this.strToolRef=strRefDB;
     }
+
+    @Override
+    public void buildGenomeIndex(String strRef) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setPermission() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

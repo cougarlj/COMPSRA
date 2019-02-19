@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This class is used to deal with the read block.
@@ -18,8 +20,10 @@ import java.util.Map;
  * @since 2018-10-10
  */
 public class ReadBlock {
+    private static final Logger LOG = LogManager.getLogger(ReadBlock.class.getName());
+    
     public int intStart;
-    public ArrayList<SAMRecord > altSAM;
+    public ArrayList<SAMRecord> altSAM;
     public LinkedHashMap<Integer,ArrayList<Character>> lhmPileUp;
     public LinkedHashMap<Integer,SNPRecord> lhmSNP;
     public int intMatch;
@@ -51,8 +55,7 @@ public class ReadBlock {
             if(this.checkSNP(item.getValue())){
                 
             }
-        }
-        
+        }       
     }
     
     public String padCIGAR(String strCIGAR){

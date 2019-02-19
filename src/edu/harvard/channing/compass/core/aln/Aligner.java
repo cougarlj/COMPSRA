@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -58,10 +59,12 @@ public abstract class Aligner implements Callable {
             while ((line = br.readLine()) != null) {
                 System.out.println(line);
                 sb.append(line);
+                sb.append(System.lineSeparator());
             }
             while ((line = err.readLine()) != null) {
                 System.out.println(line);
                 sb.append(line);
+                sb.append(System.lineSeparator());
             }
             
             this.reportAln();
@@ -128,4 +131,48 @@ public abstract class Aligner implements Callable {
         }
         
     }
+
+    public String runCmd(String strCmd) {
+        try {
+            LOG.info("To run: " + strCmd);
+            Process ps = Runtime.getRuntime().exec(strCmd);
+            if (ps != null) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));
+                BufferedReader err = new BufferedReader(new InputStreamReader(ps.getErrorStream()));
+                int status = ps.waitFor();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    System.out.println(line);
+                    sb.append(line);
+                    sb.append(System.lineSeparator());
+                }
+                while ((line = err.readLine()) != null) {
+                    System.out.println(line);
+                    sb.append(line);
+                    sb.append(System.lineSeparator());
+                }
+
+//                this.reportAln();
+                String tmp;
+                if (status != 0) {
+                    tmp = "Fail to call: " + strCmd;
+                } else {
+                    tmp = "Succeed to call: " + strCmd;
+                }
+                return tmp;
+            } else {
+                return "Error: No process assigned to the command: " + strCmd;
+            }
+
+        } catch (IOException ex) {
+            LOG.error(ex.getMessage());
+        } catch (InterruptedException ex) {
+            LOG.error(ex.getMessage());
+        }
+        return "Error: No process assigned to the command: " + strCmd;
+    }
+    
+    public abstract void buildGenomeIndex(String strRef);
+    public abstract void setPermission();
+    
 }

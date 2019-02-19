@@ -5,6 +5,7 @@
  */
 package edu.harvard.channing.compass.core.ann;
 
+import edu.harvard.channing.compass.core.Configuration;
 import edu.harvard.channing.compass.core.Factory;
 import htsjdk.samtools.SAMFileWriter;
 import htsjdk.samtools.SAMFileWriterFactory;
@@ -56,8 +57,11 @@ public class SAMAnnotator extends Annotator {
                     fleIn=new File(strIn.replaceAll("$.sam", ".bam"));
                 }
                 SamReader sr = SamReaderFactory.make().validationStringency(ValidationStringency.LENIENT).open(fleIn);
-                SAMFileWriter sfwUnMapped = new SAMFileWriterFactory().makeSAMWriter(sr.getFileHeader(), false, new File(this.frd.output_unmap.get(strIn)));
-//                SAMFileWriter sfwUnAnnotated = new SAMFileWriterFactory().makeSAMWriter(sr.getFileHeader(), false, fleUnAnnotated);                
+                SAMFileWriter sfwUnMapped = new SAMFileWriterFactory().makeBAMWriter(sr.getFileHeader(), false, new File(this.frd.output_unmap.get(strIn)));
+                SAMFileWriter sfwUnAnnotated=null;
+                if (this.boolShowUnAnn) {
+                    sfwUnAnnotated = new SAMFileWriterFactory().makeBAMWriter(sr.getFileHeader(), false, new File(this.frd.output_dir + this.frd.output_prefix + Configuration.ANN_OUT[1]));
+                }
                 
                 //Initialize Interpreters.
                 ArrayList<String> alt = this.frd.output_ann.get(strIn);
@@ -88,7 +92,9 @@ public class SAMAnnotator extends Annotator {
                     for (int i = 0; i < iptr.length; i++) {
                         boolHit = boolHit | iptr[i].recordLeaf(srdRead);
                     }
-//            if(!boolHit)    sfwUnAnnotated.addAlignment(srdRead);
+                    if (!boolHit && sfwUnAnnotated!=null) {
+                        sfwUnAnnotated.addAlignment(srdRead);
+                    }
                 }
                 
                 //Close FileStreams. 
@@ -97,7 +103,7 @@ public class SAMAnnotator extends Annotator {
                 }
                 sr.close();
                 sfwUnMapped.close();
-//        sfwUnAnnotated.close();
+                if(sfwUnAnnotated!=null)    sfwUnAnnotated.close();
 
                 //Start to integrate and output results.
                 for (int i = 0; i < iptr.length; i++) {

@@ -86,6 +86,7 @@ public class IPTR_miRNA extends IPTR {
             }           
            
             bw.close();
+            LOG.info(this.strOutput+" was saved.");
             
             if (this.needDetail) {
                 bw = new BufferedWriter(new FileWriter(this.strOutput+".detail"));

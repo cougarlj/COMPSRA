@@ -47,9 +47,11 @@ public class DB_GENCODE extends DB{
                 break;
             case "mm10":
                 strKey = "00020201";
+                strObj=Configuration.BUNDLE_LOC+Configuration.hmpEndoDatabase.get(strKey).strLeafObj.split(";")[1];
                 break;
             case "mm9":
                 strKey = "00020202";
+                strObj=Configuration.BUNDLE_LOC+Configuration.hmpEndoDatabase.get(strKey).strLeafObj.split(";")[0];
                 break;
             default:
                 if (strRef.contains("hg")) {
@@ -91,11 +93,13 @@ public class DB_GENCODE extends DB{
             dbt.strDB = "gencode";
         }
         
+//        System.out.println("Check point 1.");
         //Set isCovered marker. 
         this.pruneDB(dbt);
         
         //Write the obj file for use next. 
         this.writeObj(strObj, dbt);
+        LOG.info("The prebuilt database was saved in "+strObj+" .");
         
         return dbt;
     }

@@ -291,7 +291,7 @@ public class Taxonomy implements ToolKit{
             
             //Make mapping file. 
             this.acc2tax=new ConcurrentHashMap<>();
-            BufferedReader br = Factory.getReader(Configuration.NT.get("a2t"));
+            BufferedReader br = Factory.getReader(Configuration.NT.get("A2T"));
             String strLine = br.readLine();
             while ((strLine = br.readLine()) != null) {
                 String[] items = strLine.split("\t");

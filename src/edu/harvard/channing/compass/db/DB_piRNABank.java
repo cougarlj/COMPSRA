@@ -112,7 +112,7 @@ public class DB_piRNABank extends DB {
         
         //Write the obj file for use next. 
         this.writeObj(strObj, dbt);
-        LOG.info(strObj+" was built and saved!");
+        LOG.info("The prebuilt database was saved in "+strObj+" .");
         
         return dbt;
     }

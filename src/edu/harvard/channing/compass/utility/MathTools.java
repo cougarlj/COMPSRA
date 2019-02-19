@@ -6,6 +6,8 @@
 package edu.harvard.channing.compass.utility;
 
 import edu.harvard.channing.compass.entity.DBLeaf;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This class is used to provide some functions of math.
@@ -14,6 +16,7 @@ import edu.harvard.channing.compass.entity.DBLeaf;
  * @since 2017-10-01
  */
 public class MathTools {
+    private static final Logger LOG = LogManager.getLogger(MathTools.class.getClass());
     /**
      * This function is used to judge the overlap of two region (a1,a2) and (b1,b2). 
      * @param a1 Start point of Region a. 
@@ -77,6 +80,43 @@ public class MathTools {
     
     public static void main(String[] argv){
         System.out.println(compRegion(69933142,69933162,69933143,69933165));
+    }
+
+    public static double[][] CpM(double[][] intProfile) {
+        double[][] dblProfile = intProfile.clone();
+        try {
+
+            for (int i = 0; i < dblProfile[0].length; i++) {
+                int intSum = 0;
+                for (int j = 0; j < dblProfile.length; j++) {
+                    intSum += dblProfile[j][i];
+                }
+                for (int j = 0; j < dblProfile.length; j++) {
+                    dblProfile[j][i] = dblProfile[j][i] / intSum * 1e6;
+                }
+            }
+        } catch (Exception ex) {
+            LOG.error("CpM Normalization is failed! The result may be not right!");
+            return intProfile;
+        }
+        return dblProfile;
+    }
+
+    public static double[][] QT(double[][] intProfile) {
+        double[][] dblProfile = intProfile.clone();
+        try {
+            //To be Added.
+
+
+        } catch (Exception ex) {
+            LOG.error("Quantile Normalization is failed! The result may be not right!");
+            return intProfile;
+        }
+        return dblProfile;
+    }
+
+    public static double[][] QTL(double[][] intProfile) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

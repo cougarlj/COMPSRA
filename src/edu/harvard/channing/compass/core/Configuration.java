@@ -5,14 +5,23 @@
  */
 package edu.harvard.channing.compass.core;
 
+import edu.harvard.channing.compass.entity.DBTree;
 import edu.harvard.channing.compass.entity.DatabaseInfo;
+import edu.harvard.channing.compass.utility.Download;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,6 +46,7 @@ public final class Configuration {
     public static String DB;
     public static String DB_CHAIN;
     public static String DB_NT;
+    public static String DB_REF;
     public static String CONFIG_ENDO_DATABASE;
     public static String ADAPTER;
     public static String DOWNLOAD_HOMEPAGE;
@@ -44,12 +54,14 @@ public final class Configuration {
     public static String STAR;
     public static String BLAST;
     public static final String[] QC_OUT = {"_LowQualityRead.fastq.gz", "_FitRead.fastq.gz"};
-    public static final String[] ANN_OUT = {"_UnMapped.sam", "_UnAnnotated.sam"};
+    public static final String[] ANN_OUT = {"_UnMapped.bam", "_UnAnnotated.bam"};
     public static final String[] MIC_OUT = {"_metaphlan.txt"};
 
     public static final String TAXONOMY = "ldkpcofgst";
     public static final int BUFF1 = 1024 * 1024; //1M
     public static final int BUFF2 = 1024 * 1024 * 1024; //1G
+    
+    public static String strIndexSurffix=".cps.idx";
 
     public static HashMap<String, String> UCSC_CONTIG = new HashMap();
     public static HashMap<String, String> ANN_CATEGORY = new HashMap();
@@ -59,6 +71,10 @@ public final class Configuration {
     public static HashMap<String, String> METAPHLAN = new HashMap();
     public static HashMap<String, String> NT = new HashMap();
     public static HashMap<String, String> DOWNLOAD = new HashMap();
+    public static HashMap<String, String> OTHERS = new HashMap();
+    public static HashMap<Character, Integer> BASEORDER=new HashMap();
+    public static HashMap<Integer, Character> BASEORDERREV=new HashMap();
+    public static HashMap<String, String> REF=new HashMap();         
 
     public static int N_CPU;
     public static String strCurrDir;
@@ -92,7 +108,8 @@ public final class Configuration {
         Configuration.DB = BUNDLE_LOC + "/db";
         Configuration.DB_CHAIN = DB + "/chain";
         Configuration.DB_NT = DB + "/nt";
-        Configuration.CONFIG_ENDO_DATABASE = CONFIG + "/database_record.txt";
+        Configuration.DB_REF=DB+"/ref";
+        Configuration.CONFIG_ENDO_DATABASE = CONFIG + "/database_record.obj";
         Configuration.ADAPTER = CONFIG + "/adapter.txt";
         Configuration.DOWNLOAD_HOMEPAGE = "https://regepi.bwh.harvard.edu/circurna/";
         Configuration.DOWNLOAD_BUNDLE_VERSION = Configuration.BUNDLE;
@@ -101,7 +118,7 @@ public final class Configuration {
         Configuration.STAR="STAR-2.5.3a.zip";
         Configuration.BLAST="ncbi-blast-2.7.1+-x64-linux.tar.gz";
         
-        this.showLogo();
+//        this.showLogo();
         this.showModule();
 //        System.out.println("TEMP : " + System.getProperty("java.io.tmpdir")); 
 //        System.out.println("PATH : " + System.getProperty("java.library.path")); 
@@ -113,13 +130,13 @@ public final class Configuration {
         System.out.println("Bundle Directory: " + BUNDLE_LOC);
         System.out.println("Configuration Directory: " + CONFIG);
         System.out.println("Plug Directory: " + PLUG);
-        System.out.println("Output Directory: " + OUTDIR);
+//        System.out.println("Output Directory: " + OUTDIR);
         System.out.println("N_CPU: " + N_CPU);
         System.out.println();
 
         //Set the Chromosome names.
         this.setConfig();
-
+//        this.buildObj(Configuration.CONFIG+"/database_record.txt");
         //Set the adapter information used in the COMPASS pipeline. 
 //        this.setAdapter();
         //Set the endogenous database used in the COMPASS pipeline.
@@ -131,7 +148,7 @@ public final class Configuration {
 
     public void setConfig() {
         //Set ANN_CATEGORY
-        //01:miRNA 02:piRNA 03:tRNA 04:snoRNA 05:snRNA 06:circRNA. 
+        //01:miRNA 02:piRNA 03:tRNA 04:snoRNA 05:snRNA 06:circRNA 11:pre-miRNA. 
         ANN_CATEGORY.put("0", "_gencode");
         ANN_CATEGORY.put("1", "_miRNA");
         ANN_CATEGORY.put("2", "_piRNA");
@@ -139,6 +156,7 @@ public final class Configuration {
         ANN_CATEGORY.put("4", "_snoRNA");
         ANN_CATEGORY.put("5", "_snRNA");
         ANN_CATEGORY.put("6", "_circRNA");
+        ANN_CATEGORY.put("11", "_pre-miRNA");
 
         //Set PLUG_BUILT_IN
         PLUG_BUILT_IN.put("bowtie", PLUG + "/bowtie/bowtie-1.2.1.1/bowtie");
@@ -179,14 +197,12 @@ public final class Configuration {
         NT.put("names", DB_NT + "/names.dmp");
         NT.put("nodes", DB_NT + "/nodes.dmp");
         NT.put("taxonomy", PREDB + "/taxonomy.obj");
-//        NT.put("a2t", DB_NT+"/nucl_gb.accession2taxid.gz");
-//        NT.put("a2t", DB_NT + "/abfv_acc2tax.txt.gz");
         NT.put("A2T", PREDB + "/acc2tax.obj");
         NT.put("acc", PREDB + "/nt_genome.obj");
-//        NT.put("acc_archaea", "/nt_archaea.obj");
-//        NT.put("acc_bacteria", "/nt_bacteria.obj");
-//        NT.put("acc_fungi", "/nt_fungi.obj");
-//        NT.put("acc_viruses", "/nt_viruses.obj");
+
+        //Set REF
+        REF.put("hg38", PREDB+"/hg38.cps");
+        REF.put("hg38.cps", DB_REF+"/hg38.fa.gz");
 
         //Set UCSC_CONTIG_hg38       
         UCSC_CONTIG.put("chr1", "chr1");
@@ -216,6 +232,9 @@ public final class Configuration {
         UCSC_CONTIG.put("chrx", "chrX");
         UCSC_CONTIG.put("chry", "chrY");
         UCSC_CONTIG.put("chrm", "chrM");
+        UCSC_CONTIG.put("chrX", "chrX");
+        UCSC_CONTIG.put("chrY", "chrY");
+        UCSC_CONTIG.put("chrM", "chrM");
 
         UCSC_CONTIG.put("1", "chr1");
         UCSC_CONTIG.put("2", "chr2");
@@ -245,6 +264,23 @@ public final class Configuration {
         UCSC_CONTIG.put("Y", "chrY");
         UCSC_CONTIG.put("M", "chrM");    
         
+        //Set Base Order.
+        BASEORDER.put('A', 0);
+        BASEORDER.put('C', 1);
+        BASEORDER.put('G', 2);
+        BASEORDER.put('T', 3);
+        BASEORDER.put('N', 4);
+        BASEORDER.put('.', -1);
+        
+        BASEORDERREV.put(0, 'A');
+        BASEORDERREV.put(1,'C');
+        BASEORDERREV.put(2,'G');
+        BASEORDERREV.put(3,'T');
+        BASEORDERREV.put(4,'N');
+        BASEORDERREV.put(-1,'.');
+        
+        //Set Other information.
+        OTHERS.put("piRBaseID_hg.txt", DB + "/piRBase/piRBaseID.txt");
     }
 
     public void showLogo() {
@@ -283,15 +319,121 @@ public final class Configuration {
     public void showModule() {
         System.out.println("\n+++++++++++++++++++++++++++++++");
         System.out.println("+            COMPASS          +");
-        System.out.println("+      (V1.0 2018-08-01)      +");
+        System.out.println("+      (V1.0 2018-11-11)      +");
         System.out.println("+  rejia@channing.harvard.edu +");
         System.out.println("+++++++++++++++++++++++++++++++\n");
     }
 
     public void setDB() {
+        //Set Configuration file.
+        DOWNLOAD.put("database_record.obj", DOWNLOAD_HOMEPAGE+Configuration.BUNDLE+"/configuration/database_record.obj");
+
+        //Set EndoDatabase.
+        File fleConfig=new File(CONFIG_ENDO_DATABASE);
+        if(!fleConfig.exists()){
+            String strURL=DOWNLOAD.get("database_record.obj");
+            Download dldConfig=new Download(strURL,CONFIG_ENDO_DATABASE,false);
+            boolean boolFlag=dldConfig.download();
+            if(!boolFlag){
+                LOG.info("The configuration file doesn't exist! Please download it first and run the pipeline!");
+                System.exit(0);
+            }
+        }
+        hmpEndoDatabase = this.readObj(CONFIG_ENDO_DATABASE);
+        System.out.println("Configuration Info: The endogenous database configuration has been set!");
+        System.out.println("Configuration Info: " + hmpEndoDatabase.size() + " databases are set!");
+
+        
+        //Set Adapter file.
+        DOWNLOAD.put("adapter.txt", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/configuration/adapter.txt");
+        
+        //Set Reference file. 
+        DOWNLOAD.put("hg38.cps", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/prebuilt_db/hg38.cps");
+        
+        //Set Download HashMap.
+        for (DatabaseInfo dbi : Configuration.hmpEndoDatabase.values()) {
+            String strKey = new File(dbi.strLeafDownloadAnn).getName();
+            if(strKey.startsWith("NA")) continue;
+            else{
+                DOWNLOAD.put(strKey, DOWNLOAD_HOMEPAGE + DOWNLOAD_BUNDLE_VERSION+ dbi.strLeafDownloadAnn);
+            }
+            
+            String[] strKeys= dbi.strLeafObj.split(";");
+            for(String key:strKeys){
+                if(key.startsWith("NA"))    continue;
+                else{
+                    strKey=new File(key).getName();
+                    DOWNLOAD.put(strKey, DOWNLOAD_HOMEPAGE + DOWNLOAD_BUNDLE_VERSION+ key);
+                }
+            }
+        }
+        DOWNLOAD.put("star", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/"+STAR);
+        DOWNLOAD.put("blast", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/blast/"+BLAST);
+        DOWNLOAD.put("blast2", "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.7.1/"+BLAST);
+        DOWNLOAD.put(STAR,DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/"+STAR);
+//        DOWNLOAD.put("hg19.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/hg19.fa.gz");
+        DOWNLOAD.put("hg19.fa.gz", "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz");
+//        DOWNLOAD.put("hg38.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/hg38.fa.gz");
+        DOWNLOAD.put("hg38.fa.gz", "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz");
+        DOWNLOAD.put("mm9.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/mm9.fa.gz");
+        DOWNLOAD.put("mm10.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/mm10.fa.gz");
+        DOWNLOAD.put(BLAST, "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.7.1/"+BLAST);
+        DOWNLOAD.put("nt_archaea.fasta.gz",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/nt_archaea.fasta.gz");
+        DOWNLOAD.put("nt_bacteria.fasta.gz",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/nt_bacteria.fasta.gz");
+        DOWNLOAD.put("nt_fungi.fasta.gz",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/nt_fungi.fasta.gz");
+        DOWNLOAD.put("nt_viruses.fasta.gz",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/nt_viruses.fasta.gz");
+        DOWNLOAD.put("names.dmp",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/names.dmp");
+        DOWNLOAD.put("nodes.dmp",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/nodes.dmp");
+        DOWNLOAD.put("acc2tax.obj",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/prebuilt_db/acc2tax.obj");
+        DOWNLOAD.put("nt_genome.obj",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/prebuilt_db/nt_genome.obj");
+        DOWNLOAD.put("taxonomy.obj",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/prebuilt_db/taxonomy.obj");
+        //For test purpose.
+//        DOWNLOAD.put("test","https://www.dropbox.com/s/ci8o91zm1xw4nuk/nodes.dmp?dl=0");
+    }
+
+    
+    public void writeObj(String strObj, HashMap<String, DatabaseInfo> hmpDB) {
+        ObjectOutputStream oos = null;
+        try {
+            oos = new ObjectOutputStream(new GZIPOutputStream(new FileOutputStream(strObj)));
+            oos.writeObject(hmpDB);
+            oos.close();
+        } catch (IOException ex) {
+            LOG.error(ex.getMessage());
+        } finally {
+            try {
+                oos.close();
+            } catch (IOException ex) {
+                LOG.error(ex.getMessage());
+            }
+        }
+    }
+
+    public HashMap<String, DatabaseInfo> readObj(String strFile) {
+        ObjectInputStream ois = null;
+        HashMap<String, DatabaseInfo> hmpConfig = null;
+        try {
+            File fleObj = new File(strFile);
+            if (!fleObj.exists()) {
+                return null;
+            }
+            ois = new ObjectInputStream(new GZIPInputStream(new FileInputStream(strFile)));
+            hmpConfig = (HashMap<String, DatabaseInfo>) ois.readObject();
+            ois.close();
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage());
+            LOG.error("Fail to find the prebuilt configuration obj file!");
+        } finally {
+            return hmpConfig;
+        }
+    }
+
+    
+    public void buildObj(String strFile) {
+        BufferedReader brDB = null;
         try {
             hmpEndoDatabase = new <String, DatabaseInfo>HashMap();
-            BufferedReader brDB = new BufferedReader(new FileReader(CONFIG_ENDO_DATABASE));
+            brDB = new BufferedReader(new FileReader(strFile));
             String strLine;
             while ((strLine = brDB.readLine()) != null) {
                 if (strLine.startsWith("#")) {
@@ -315,59 +457,18 @@ public final class Configuration {
                 dbiEntity.strLeafDependency = strColumns[12];
                 dbiEntity.strLeafDownloadAnn = strColumns[13];
                 dbiEntity.strLeafObj = strColumns[14];
-                hmpEndoDatabase.put(strColumns[0], dbiEntity);               
+                hmpEndoDatabase.put(strColumns[0], dbiEntity);
             }
-            System.out.println("Configuration Info: The endogenous database configuration has been read in!");
+            System.out.println("Configuration Info: The endogenous database configuration has been set!");
             System.out.println("Configuration Info: " + hmpEndoDatabase.size() + " databases are set!");
-
-            
-            //Set Download HashMap.
-            for (DatabaseInfo dbi : Configuration.hmpEndoDatabase.values()) {
-                String strKey = new File(dbi.strLeafDownloadAnn).getName();
-                if(strKey.startsWith("NA")) continue;
-                else{
-                    DOWNLOAD.put(strKey, DOWNLOAD_HOMEPAGE + DOWNLOAD_BUNDLE_VERSION+ dbi.strLeafDownloadAnn);
-                }
-                
-                String[] strKeys= dbi.strLeafObj.split(";");
-                for(String key:strKeys){
-                    if(key.startsWith("NA"))    continue;
-                    else{
-                        strKey=new File(key).getName();
-                        DOWNLOAD.put(strKey, DOWNLOAD_HOMEPAGE + DOWNLOAD_BUNDLE_VERSION+ key);
-                    }
-                }
-            }
-            DOWNLOAD.put("star", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/"+STAR);
-            DOWNLOAD.put("blast", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/blast/"+BLAST);
-            DOWNLOAD.put("blast2", "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.7.1/"+BLAST);
-            
-            DOWNLOAD.put(STAR,DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/"+STAR);
-            DOWNLOAD.put("hg19.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/hg19.fa.gz");
-            DOWNLOAD.put("hg38.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/hg38.fa.gz");
-            DOWNLOAD.put("mm9.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/mm9.fa.gz");
-            DOWNLOAD.put("mm10.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/mm10.fa.gz");
-            
-            DOWNLOAD.put(BLAST, "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.7.1/"+BLAST);
-            DOWNLOAD.put("nt_archaea.fasta.gz",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/nt_archaea.fasta.gz");
-            DOWNLOAD.put("nt_bacteria.fasta.gz",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/nt_bacteria.fasta.gz");
-            DOWNLOAD.put("nt_fungi.fasta.gz",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/nt_fungi.fasta.gz");
-            DOWNLOAD.put("nt_viruses.fasta.gz",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/nt_viruses.fasta.gz");
-            DOWNLOAD.put("names.dmp",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/names.dmp");
-            DOWNLOAD.put("nodes.dmp",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/nodes.dmp");
-            DOWNLOAD.put("acc2tax.obj",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/prebuilt_db/acc2tax.obj");
-            DOWNLOAD.put("nt_genome.obj",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/prebuilt_db/nt_genome.obj");
-            DOWNLOAD.put("taxonomy.obj",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/prebuilt_db/taxonomy.obj");
-            
-            //For test purpose.
-            DOWNLOAD.put("test","https://www.dropbox.com/s/ci8o91zm1xw4nuk/nodes.dmp?dl=0");
-
         } catch (FileNotFoundException ex) {
             System.out.println("Error Info: The database configuration file doesn't exist! ");
             System.exit(0);
         } catch (IOException ex) {
             System.out.println("Error Info: Something wrong in the database configuration file!");
+            System.exit(0);
         }
+        this.writeObj(strFile.replace(".txt", ".obj"), hmpEndoDatabase);
     }
 
     public static String getContig(String key, String contig) {
@@ -1690,4 +1791,9 @@ public final class Configuration {
 //}    
     }
 
+    
+    public static void main(String[] args){
+        Configuration config=new Configuration();
+
+    }
 }

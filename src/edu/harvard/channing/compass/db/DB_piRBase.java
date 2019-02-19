@@ -106,7 +106,7 @@ public class DB_piRBase extends DB{
 
         //Add accession ID . 
         if (strRef.contains("hg")) {
-            HashMap<String, String> hmpAcc = ReadFile.getHMP(Configuration.DB + "/piRBase/piRBaseID.txt", 0, 1);
+            HashMap<String, String> hmpAcc = ReadFile.getHMP(Configuration.OTHERS.get("piRBaseID_hg.txt"), 0, 1);
             for (String key : dbt.hmpStart.keySet()) {
                 for (int pos : dbt.hmpStart.get(key)) {
                     for (DBLeaf dif : dbt.hmpDB.get(key).get(pos)) {
@@ -124,6 +124,7 @@ public class DB_piRBase extends DB{
         
         //Write the obj file for use next. 
         this.writeObj(strObj, dbt);
+        LOG.info("The prebuilt database was saved in "+strObj+" .");
         
         return dbt;
     }

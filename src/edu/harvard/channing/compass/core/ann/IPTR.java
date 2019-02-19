@@ -45,7 +45,7 @@ public abstract class IPTR {
     public boolean boolCR=false;
     public boolean needBAMOutput=false;
     public SAMFileWriter sfwSpecialRNA;
-    public boolean needDetail=true;
+    public boolean needDetail=false;
     
     IPTR(String strFile){
         this.strOutput=strFile;
@@ -94,6 +94,7 @@ public abstract class IPTR {
                 bw.newLine();
             }                  
             bw.close();
+            LOG.info(this.strOutput+" was saved.");
             
             if (this.needDetail) {
                 bw = new BufferedWriter(new FileWriter(this.strOutput+".detail"));

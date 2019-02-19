@@ -92,6 +92,7 @@ public class DB_miRBase extends DB{
         
         //Write the obj file for use next. 
         this.writeObj(strObj, dbt);
+        LOG.info("The prebuilt database was saved in "+strObj+" .");
         
         return dbt;
     }

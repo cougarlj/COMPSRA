@@ -9,6 +9,10 @@ import edu.harvard.channing.compass.core.Configuration;
 import edu.harvard.channing.compass.utility.Download;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This Class is used to Download the resource for COMPASS independently. 
@@ -17,29 +21,38 @@ import java.util.HashMap;
  * @since 2018-09-11
  */
 public class DownloadResource implements ToolKit{
-
+    private static final Logger LOG = LogManager.getLogger(DownloadResource.class.getName());
     public String strResource;
+    public boolean boolListResource=false;
     /**
      * This HashMap can map from user resource key to a list of local resource address. 
      */
     HashMap<String,ArrayList<Download>> hmpResource;
 //    HashMap<String,ArrayList<String>> hmpResource;    
     ArrayList<Download> altDownload;
+
+
+    
     
 
     @Override
     public int runKit() {
         buildMap();
-        parseResource();
-        downloadResource();
-        
+        if (boolListResource) {
+            this.listResource();
+        } else {
+            parseResource();
+            downloadResource();
+        }
         return 1;
     }
-    
+    /**
+     * This Function is used to package resources.
+     */
     public void buildMap(){
         hmpResource=new HashMap();
+        
         //For annotation module.
-//        ArrayList<String> altTmp=new ArrayList();
         ArrayList<Download> altTmp=new ArrayList();
         altTmp.add(new Download(Configuration.BUNDLE_LOC+Configuration.hmpEndoDatabase.get("01010102").strLeafObj.split(";")[0],false));//miRBase_hg19
         hmpResource.put("miRNA_hg19", altTmp);       
@@ -136,16 +149,16 @@ public class DownloadResource implements ToolKit{
         altTmp.add(new Download(Configuration.BUNDLE_LOC+ "/plug/star/" + Configuration.STAR,true));
         hmpResource.put("star", altTmp);
         altTmp=new ArrayList();
-        altTmp.add(new Download(Configuration.BUNDLE_LOC+ "/db/star/hg19/hg19.fa.gz",false));
+        altTmp.add(new Download(Configuration.STAR_REF.get("star_hg19")+"/hg19.fa.gz",true));
         hmpResource.put("star_hg19", altTmp);        
         altTmp=new ArrayList();
-        altTmp.add(new Download(Configuration.BUNDLE_LOC+ "/db/star/hg38/hg38.fa.gz",false));
+        altTmp.add(new Download(Configuration.STAR_REF.get("star_hg38")+"/hg38.fa.gz",true));
         hmpResource.put("star_hg38", altTmp);
         altTmp=new ArrayList();
-        altTmp.add(new Download(Configuration.BUNDLE_LOC+ "/db/star/mm9/mm9.fa.gz",false));
+        altTmp.add(new Download(Configuration.STAR_REF.get("star_mm9")+"/mm9.fa.gz",false));
         hmpResource.put("star_mm9", altTmp);
         altTmp=new ArrayList();
-        altTmp.add(new Download(Configuration.BUNDLE_LOC+ "/db/star/mm10/mm10.fa.gz",false));
+        altTmp.add(new Download(Configuration.STAR_REF.get("star_mm10")+"/mm10.fa.gz",false));
         hmpResource.put("star_mm10", altTmp);
 
         
@@ -181,6 +194,10 @@ public class DownloadResource implements ToolKit{
     
     public void parseResource(){
         altDownload=new ArrayList();
+        if(this.strResource==null){
+            LOG.error("No resource was set!");
+            return;
+        }
         String[] strItems=this.strResource.split(",|;");
         for(String strItem:strItems){
             for(Download dldObject:this.hmpResource.get(strItem)){
@@ -192,6 +209,16 @@ public class DownloadResource implements ToolKit{
     public void downloadResource(){
         for(Download dldObject:this.altDownload){
             dldObject.download();
+        }
+    }
+    
+    public void listResource(){
+        Iterator<Map.Entry<String,ArrayList<Download>>> itrResource=this.hmpResource.entrySet().iterator();
+        while(itrResource.hasNext()){
+            Map.Entry<String,ArrayList<Download>> entry=itrResource.next();
+            for(Download dld:entry.getValue()){
+                System.out.println(entry.getKey()+" --> "+dld.strTargetURL);
+            }
         }
     }
     

@@ -110,6 +110,12 @@ public class StringTools {
         return sb.toString();
     }
     
+    public static String byte2string(ArrayList<Byte> byt){
+        StringBuilder sb=new StringBuilder();
+        for(byte b:byt) sb.append((char)b);
+        return sb.toString();        
+    }
+    
     public static void main(String[] args) {
 //        String read1="CTGCTCCCTGGTGGTCTAGTGGTTAGGATTCGGCGCTCTTCGTGGAATTC"; //partly overlap. return 42
 //        String read2="CCACTCCTGACACCAGGGCTGGAATTCTCGGGTGCCAAGGTGGAATTCTC"; //totally overlap. return 19

@@ -35,6 +35,7 @@ public class Annotation {
     public float fltOverlap=(float)1;
     public int intTd=1;
     public boolean needBAMOutput=false;
+    public boolean boolShowUnAnn=false;
 
     public Annotation(CommonParameter comParam) {
         this.comParam = comParam;
@@ -47,7 +48,8 @@ public class Annotation {
         this.showModule();
         
         String message;
-        ExecutorService exe=Executors.newCachedThreadPool();
+//        ExecutorService exe=Executors.newCachedThreadPool();
+        ExecutorService exe=Executors.newFixedThreadPool(this.comParam.intThread);
         ArrayList<Future<String>> lstResult=new ArrayList<Future<String>>();
         
         for (FileRecord frd : this.comParam.altInput) {
@@ -60,6 +62,7 @@ public class Annotation {
             ann.boolRmSamMap=this.boolRmSamMap;
             ann.boolCR=this.comParam.boolCheckResource;
             ann.needBAMOutput=this.needBAMOutput;
+            ann.boolShowUnAnn=this.boolShowUnAnn;
             
             Future<String> future = exe.submit(ann);
             lstResult.add(future);

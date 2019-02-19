@@ -7,6 +7,7 @@ package edu.harvard.channing.compass.core.fun;
 
 import edu.harvard.channing.compass.core.Factory;
 import edu.harvard.channing.compass.core.Configuration;
+import edu.harvard.channing.compass.utility.MathTools;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -172,6 +173,15 @@ public class Dispatcher implements Callable{
     
     public void normProfile(){
         //Do something for intProfile;
+        if("cpm".equals(this.strNorm)){
+            this.intProfile=MathTools.CpM(this.intProfile);
+        }else if("qt".equals(this.strNorm)){
+            this.intProfile=MathTools.QT(this.intProfile);
+        }else if("qtl".equals(this.strNorm)){
+            this.intProfile=MathTools.QTL(this.intProfile);
+        }else{
+            return;
+        }
     }
     
     public void testProfile(){
@@ -232,6 +242,8 @@ public class Dispatcher implements Callable{
             bw.close();
         } catch (IOException ex) {
             LOG.error(ex.getMessage());
+        }finally{
+            
         }
     }
     
@@ -241,31 +253,35 @@ public class Dispatcher implements Callable{
         this.setColumn();
         this.runPicker();
         this.convergePicker();
+        this.normProfile();
         this.testProfile();
         this.outputResult();    
         return "The "+this.strRNA+" detacher was completed.";
     }
     
     public static void main(String[] argv){
+        Configuration config=new Configuration();
         ArrayList<String> altCase=new ArrayList<String>();
         ArrayList<String> altCtrl=new ArrayList<String>();
         ArrayList<String> altTest=new ArrayList<String>();
         
-//        altCase.add("E:\\01Work\\miRNA\\project\\CircuRNA\\output\\S-001570893_CGATGT_L001_R1\\S-001570893_CGATGT_L001_R1_17to50_FitRead_STAR_Aligned_circRNA.txt");
-//        altCase.add("E:\\01Work\\miRNA\\project\\CircuRNA\\output\\HBRNA_AGTCAA_L001_R1\\HBRNA_AGTCAA_L001_R1_17to50_FitRead_STAR_Aligned_circRNA.txt");
-//        altCtrl.add("E:\\01Work\\miRNA\\project\\CircuRNA\\output\\HBRNA_AGTCAA_L001_R1\\HBRNA_AGTCAA_L001_R1_17to50_FitRead_STAR_Aligned_circRNA.txt");
+        altCase.add("E:\\01Work\\miRNA\\project\\COMPASS\\output\\S-001570892_ATCACG_L001_R1\\S-001570892_ATCACG_L001_R1_17to50_FitRead_STAR_Aligned_miRNA.txt");
+        altCase.add("E:\\01Work\\miRNA\\project\\COMPASS\\output\\S-001570893_CGATGT_L001_R1\\S-001570893_CGATGT_L001_R1_17to50_FitRead_STAR_Aligned_miRNA.txt");
+        altCtrl.add("E:\\01Work\\miRNA\\project\\COMPASS\\output\\HBRNA_AGTCAA_L001_R1\\HBRNA_AGTCAA_L001_R1_17to50_FitRead_STAR_Aligned_circRNA.txt");
 //        altCase.add("E:\\01Work\\microbe\\data\\ncbi_part_tree2.txt");
 //        altCtrl.add("E:\\01Work\\microbe\\data\\ncbi_part_tree2.txt");
-        altCase.add("E:\\01Work\\miRNA\\project\\COMPASS\\output\\HBRNA_AGTCAA_L001_R1\\HBRNA_AGTCAA_L001_R1_17to50_FitRead_STAR_Aligned_UnMapped_MetaPhlAn.txt");
-        altCtrl.add("E:\\01Work\\miRNA\\project\\COMPASS\\output\\HBRNA_AGTCAA_L001_R1\\HBRNA_AGTCAA_L001_R1_17to50_FitRead_STAR_Aligned_UnMapped_MetaPhlAn.txt");
+//        altCase.add("E:\\01Work\\miRNA\\project\\COMPASS\\output\\HBRNA_AGTCAA_L001_R1\\HBRNA_AGTCAA_L001_R1_17to50_FitRead_STAR_Aligned_UnMapped_MetaPhlAn.txt");
+//        altCtrl.add("E:\\01Work\\miRNA\\project\\COMPASS\\output\\HBRNA_AGTCAA_L001_R1\\HBRNA_AGTCAA_L001_R1_17to50_FitRead_STAR_Aligned_UnMapped_MetaPhlAn.txt");
         altTest.add("mwu");
         
-        Dispatcher dtc=new Dispatcher("metaphlan","fungi","",altTest,altCase,altCtrl,"E:\\01Work\\miRNA\\project\\COMPASS\\output\\blast_fungi.txt",true);
+//        Dispatcher dtc=new Dispatcher("metaphlan","fungi","cpm",altTest,altCase,altCtrl,"E:\\01Work\\miRNA\\project\\COMPASS\\output\\blast_fungi.txt",true);
+        Dispatcher dtc=new Dispatcher("1","none",altTest,altCase,altCtrl,"E:\\01Work\\miRNA\\project\\COMPASS\\output\\test_deg2.txt");
 //        dtc.strOutput="E:\\01Work\\miRNA\\project\\COMPASS\\output\\piRNA.txt";
         dtc.setColumn();
         dtc.runPicker();
         dtc.convergePicker();
-        dtc.testProfile();
+        dtc.normProfile();
+        dtc.testProfile();       
         dtc.outputResult();
         
     }

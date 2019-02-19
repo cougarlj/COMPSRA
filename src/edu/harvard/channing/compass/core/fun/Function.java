@@ -31,7 +31,7 @@ public class Function {
     public String strClass="1,2,3,4,5,6";
     public String strCase="";
     public String strCtrl="";
-    public String strNorm="none";
+    public String strNorm="cpm";
     public String strTest="mwu";
     public boolean boolOrder=true;
     public boolean boolMic=false;
@@ -50,9 +50,9 @@ public class Function {
             return -1;
         }
         this.showModule();
-
         String message;
-        ExecutorService exe=Executors.newCachedThreadPool();
+//        ExecutorService exe=Executors.newCachedThreadPool();
+        ExecutorService exe=Executors.newFixedThreadPool(this.comParam.intThread);
         ArrayList<Future<String>> lstResult=new ArrayList<>();
         
         if(this.boolDEG){

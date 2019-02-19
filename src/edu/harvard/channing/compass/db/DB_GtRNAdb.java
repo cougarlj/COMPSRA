@@ -83,13 +83,13 @@ public class DB_GtRNAdb extends DB{
                 if (!strRef.contains("hg19")) {
                     needLiftOver = true;
                     strLiftOver = ReadFile.getLiftOverFile("hg19", strRef);
-                    LOG.info("LiftOver Info: " + strLiftOver + " is used!\n");
+                    LOG.info("LiftOver Info: " + strLiftOver + " is used!");
                 }
             } else if (strRef.startsWith("mm")) {
                 if (!strRef.contains("mm10")) {
                     needLiftOver = true;
                     strLiftOver = ReadFile.getLiftOverFile("mm10", strRef);
-                    LOG.info("LiftOver Info: " + strLiftOver + " is used!\n");
+                    LOG.info("LiftOver Info: " + strLiftOver + " is used!");
                 }
             }
             
@@ -106,6 +106,7 @@ public class DB_GtRNAdb extends DB{
         
         //Write the obj file for use next. 
         this.writeObj(strObj, dbt);
+        LOG.info("The prebuilt database was saved in "+strObj+" .\n");
         
         return dbt;
     }

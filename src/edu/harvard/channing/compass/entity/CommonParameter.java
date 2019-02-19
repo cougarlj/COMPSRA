@@ -25,7 +25,7 @@ public class CommonParameter {
     
     public String input;
 //    public String output;
-    public int intThread;
+    public int intThread=1;
     public String strPrefix;
     public ArrayList<FileRecord> altInput;
     public String strRefGenome;

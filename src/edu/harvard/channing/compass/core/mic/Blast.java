@@ -59,6 +59,11 @@ public class Blast extends MicTool{
             String strCmd=Configuration.PLUG_BUILT_IN.get("makeblastdb");
             String strCmdLine=strCmd+" -in "+strFA+" -dbtype nucl -title nt_"+db+" -parse_seqids";
             
+            File fleMDB=new File(strCmd);
+            if(!fleMDB.canExecute()){
+                fleMDB.setExecutable(true);
+            }
+            
             int intFlag=this.detectDBIndex(strFA);
             if(intFlag==0){
                 String strResult=this.runCmd(strCmdLine);
@@ -166,6 +171,10 @@ public class Blast extends MicTool{
             if (!boolFlag) {
                 LOG.error("Faile to download the file " + strURL);
                 LOG.info("Please download BLAST by yourself.");
+            }
+        }else{
+            if(!fleTool.canExecute()){
+                fleTool.setExecutable(true);
             }
         }
     }

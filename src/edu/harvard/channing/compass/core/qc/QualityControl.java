@@ -65,7 +65,8 @@ public class QualityControl {
         this.showModule();
 //        String[] strIn=this.comParam.CommonParameter.this.strInput.split(",|;|:");
         String message;
-        ExecutorService exe = Executors.newCachedThreadPool();
+//        ExecutorService exe = Executors.newCachedThreadPool();
+        ExecutorService exe=Executors.newFixedThreadPool(this.comParam.intThread);
         ArrayList<Future<String>> lstResult = new ArrayList<Future<String>>();
         for (int i = 0; i < this.comParam.altInput.size(); i++) {
             Fastq fq = new Fastq(this.comParam.altInput.get(i), this);           

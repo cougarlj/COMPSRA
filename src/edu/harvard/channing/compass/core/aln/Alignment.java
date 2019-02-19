@@ -33,6 +33,7 @@ public class Alignment {
     public String strIndex="last";
     public String strRefGenome="hg38";
     public String strParam;
+    public boolean needIndex=false;
     
 //    public boolean boolEndogenous=false;
 ////    public String strEndogenous="1,2,3,4,5,6";
@@ -53,7 +54,8 @@ public class Alignment {
         this.showModule();
 //        this.qc=qc;
         String message;
-        ExecutorService exe = Executors.newCachedThreadPool();
+//        ExecutorService exe = Executors.newCachedThreadPool();
+        ExecutorService exe=Executors.newFixedThreadPool(this.comParam.intThread);
         ArrayList<Future<String>> lstResult = new ArrayList<Future<String>>();
 
         for (int i = 0; i < this.comParam.altInput.size(); i++) {
@@ -67,7 +69,12 @@ public class Alignment {
                 Aligner alnr = Factory.getAligner(this.strAlignTool, strFQ, frd.output_aln.get(strFQ));
                 if(this.comParam.boolCheckResource){
                     alnr.checkAligner(this.strAlignTool.toLowerCase());
-                }               
+                }   
+                alnr.setPermission();
+                if(this.needIndex){
+                    alnr.buildGenomeIndex(this.strRefGenome);
+                }  
+                
                 alnr.frd = frd;
                 alnr.setParam(this.strParam);
                 alnr.setRef(this.strRefGenome);
