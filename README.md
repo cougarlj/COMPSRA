@@ -105,41 +105,41 @@ Download human reference genome hg38:
 
 QC Module:
 
-**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -in ./example/sample01.fastq -out ./example_out/ **
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -in ./example/sample01.fastq -out ./example_out/**
 
 Alignment Module:
 
-**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -aln -mt star -mbi -in ./example_out/sample01/sample01_17to50_FitRead.fastq.gz -out ./example_out/sample01/sample01_17to50_FitRead **
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -aln -mt star -mbi -in ./example_out/sample01/sample01_17to50_FitRead.fastq.gz -out ./example_out/sample01/sample01_17to50_FitRead**
 
 *(Note: -mbi was only needed for the first time when you run COMPASS and built the index files for STAR. This process will cost about 3 hours.)*
 
 Annotation Module:
 
-**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -ann -ac 1,2,3,4,5,6 -in ./example_out/sample01/sample01_17to50_FitRead_STAR_Aligned.out.bam -out ./example_out/sample01/sample01_17to50_FitRead_STAR_Aligned **
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -ann -ac 1,2,3,4,5,6 -in ./example_out/sample01/sample01_17to50_FitRead_STAR_Aligned.out.bam -out ./example_out/sample01/sample01_17to50_FitRead_STAR_Aligned**
 
 *(Note: The top three modules can run together in a pipeline.)*
 
-**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -in ./example/sample01.fastq -out ./example_out/ **
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -in ./example/sample01.fastq -out ./example_out/**
 
 *(Note: When running multiple samples, you can write the input file names into a single file and use -inf instead of -in. Also, the three modules can be conducted in one command. )*
 
-**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -inf ./example/sample.list -out ./example_out/ **
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -inf ./example/sample.list -out ./example_out/**
 
 Function Module:
 
-**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -fun -fd -fdclass 1,2,3,4,5,6 -fdcase 1-6 -fdctrl 7-12 -fdnorm cpm -fdtest mwu -fdann -pro COMPASS_DEG -inf ./example/sample.list -out ./example_out/ ** 
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -fun -fd -fdclass 1,2,3,4,5,6 -fdcase 1-6 -fdctrl 7-12 -fdnorm cpm -fdtest mwu -fdann -pro COMPASS_DEG -inf ./example/sample.list -out ./example_out/** 
 
 *(Note: If you only want to merge the count files, you can use -fm -fms.)*
 
-**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -fun -fm -fms 1-12 -fdclass 1,2,3,4,5,6 -fdann -pro COMPASS_MERGE -inf ./example/sample.list -out ./example_out/ **
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -fun -fm -fms 1-12 -fdclass 1,2,3,4,5,6 -fdann -pro COMPASS_MERGE -inf ./example/sample.list -out ./example_out/**
 
 #### 3.2.2 Run COMPASS in a pipeline
 
-**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -fun -fd -fdclass 1,2,3,4,5,6 -fdcase 1-6 -fdctrl 7-12 -fdnorm cpm -fdtest mwu -fdann -pro ALL_DEG -inf ./example/sample.list -out ./example_out/ **
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -fun -fd -fdclass 1,2,3,4,5,6 -fdcase 1-6 -fdctrl 7-12 -fdnorm cpm -fdtest mwu -fdann -pro ALL_DEG -inf ./example/sample.list -out ./example_out/**
 
 *(Note: To merge count files, you can still run COMPASS in a pipeline.)*
 
-**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -fun -fm -fms 1-12 -fdclass 1,2,3,4,5,6 -fdann -pro ALL_MERGE -inf ./example/sample.list -out ./example_out/ **
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -fun -fm -fms 1-12 -fdclass 1,2,3,4,5,6 -fdann -pro ALL_MERGE -inf ./example/sample.list -out ./example_out/**
 
 ### 3.2.3 Microbe Module (Optional)
 
@@ -147,27 +147,27 @@ Function Module:
 
 Step 1: Download and install BLAST.
 
-**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck blast **
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck blast**
 
 Step 2: Download taxonomy information.
 
-**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck blast_taxonomy **
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck blast_taxonomy**
 
 Step 3: Download microbial prebuilt database. In COMPASS, we have prebuilt four microbial databases: blast_archaea, blast_bacteria, blast_fungi, blast_viruses.
 
-**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck blast_archaea **
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck blast_archaea**
 
 Step 4: Run Microbe Module in COMPASS with -mic.
 
-**~/COMPASS$ java -jar COMPASS.jar -mic -mtool Blast -mdb archaea -in ./example_out/sample01/sample01_17to50_FitRead_STAR_Aligned_UnMapped.bam -out ./example_out/ **
+**~/COMPASS$ java -jar COMPASS.jar -mic -mtool Blast -mdb archaea -in ./example_out/sample01/sample01_17to50_FitRead_STAR_Aligned_UnMapped.bam -out ./example_out/**
 
 *(Note: You can still add the Microbe Module into the whole pipeline.)*
 
-**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -mic -mtool Blast -mdb archaea -in ./example/sample01.fastq -out ./example_out/ **
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -mic -mtool Blast -mdb archaea -in ./example/sample01.fastq -out ./example_out/**
 
 *(Note: For multiple samples, take a file list as input. )*
 
-**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -mic -mtool Blast -mdb archaea -inf ./example/sample.list -out ./example_out/ **
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -mic -mtool Blast -mdb archaea -inf ./example/sample.list -out ./example_out/**
 
 ## 4 Options
 
