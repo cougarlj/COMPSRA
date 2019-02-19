@@ -34,10 +34,140 @@ When you installed the JAVA Virtual Machine and COMPASS successfully, you could 
 
 **Download human genome for STAR** Before running STAR for alignment, you should download the reference genome and build the index. You can download the human reference genome hg38 by the command: java -jar COMPASS.jar -tk -dr -ck star_hg38. COMPASS can build the index when it runs for the first time. If failed, please enter the STAR installation directory and set it executive through the command chmod.
 
-## 3 Quick Examples
+## 3 Examples
+(NOte: We demonstrate COMPASS in the ~/COMPASS directory in Linux OS.)
 
-### 3.1 Run COMPASS
-java -jarCOMPASS.jar -in SampleA.fastq.gz;SampleB.fastq.gz -refhg38 -qc -raTGGAATTCTCGGGTGCCAAGG -rb4 -rh20 -rt20 -rr20 -rlh8;17 -aln -mtstar -midx2;3 -ann -ac 1;2;3;4;5;6 -aic -mic -mtoolB last -md barchaea;viruses -fun -fd -fdclass 1;2;3;4;5;6 -fdcase 1;2;1 -fdctrl 2;2
+**~$ mkdir COMPASS**
+
+**~$ mkdir COMPASS**
+
+### 3.1 Preparation
+
+#### 3.1.1 Download COMPASS
+
+**~/COMPASS$ wget https://regepi.bwh.harvard.edu/circurna/COMPASS_V1.0.zip**
+
+**~/COMPASS$ unzip COMPASS_V1.0.zip**
+
+After uncompressing the zip file, you can find the following materials:
+
+-**COMPASS.jar :** This is the compiled jar package of COMPASS.
+
+-**COMPASS_tutorial_v1.0.pdf :** The tutorial of COMPASS v1.0.
+
+-**bundle_v1 :** This directory contains all the resources that COMPASS may used, such as databases, reference genome, plugs.
+
+-**example :** This directory contains examples for demonstration.
+
+#### 3.1.2 Download Resources
+
+Download miRNA prebuilt databases:
+
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck miRNA_hg38**
+
+Download piRNA prebuilt databases:
+
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck piRNA_hg38**
+
+Download tRNA prebuilt databases:
+
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck tRNA_hg38**
+
+Download snoRNA prebuilt databases:
+
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck snoRNA_hg38**
+
+Download snRNA prebuilt databases:
+
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck snRNA_hg38**
+
+Download circRNA prebuilt databases:
+
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck circRNA_hg38**
+
+Download all prebuilt databases:
+
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck miRNA_hg38,piRNA_hg38,tRNA_hg38,snoRNA_hg38,snRNA_hg38,circRNA_hg38**
+
+#### 3.1.3 Download and install STAR
+
+Download STAR:
+
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck star**
+
+Download human reference genome hg38:
+
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck star_hg38**
+
+### 3.2 Test Examples
+
+#### 3.2.1 Run COMPASS module by module
+
+QC Module:
+
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -in ./example/sample01.fastq -out ./example_out/ **
+
+Alignment Module:
+
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -aln -mt star -mbi -in ./example_out/sample01/sample01_17to50_FitRead.fastq.gz -out ./example_out/sample01/sample01_17to50_FitRead **
+
+*(Note: -mbi was only needed for the first time when you run COMPASS and built the index files for STAR. This process will cost about 3 hours.)*
+
+Annotation Module:
+
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -ann -ac 1,2,3,4,5,6 -in ./example_out/sample01/sample01_17to50_FitRead_STAR_Aligned.out.bam -out ./example_out/sample01/sample01_17to50_FitRead_STAR_Aligned **
+
+*(Note: The top three modules can run together in a pipeline.)*
+
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -in ./example/sample01.fastq -out ./example_out/ **
+
+*(Note: When running multiple samples, you can write the input file names into a single file and use -inf instead of -in. Also, the three modules can be conducted in one command. )*
+
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -inf ./example/sample.list -out ./example_out/ **
+
+Function Module:
+
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -fun -fd -fdclass 1,2,3,4,5,6 -fdcase 1-6 -fdctrl 7-12 -fdnorm cpm -fdtest mwu -fdann -pro COMPASS_DEG -inf ./example/sample.list -out ./example_out/ ** 
+
+*(Note: If you only want to merge the count files, you can use -fm -fms.)*
+
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -fun -fm -fms 1-12 -fdclass 1,2,3,4,5,6 -fdann -pro COMPASS_MERGE -inf ./example/sample.list -out ./example_out/ **
+
+#### 3.2.2 Run COMPASS in a pipeline
+
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -fun -fd -fdclass 1,2,3,4,5,6 -fdcase 1-6 -fdctrl 7-12 -fdnorm cpm -fdtest mwu -fdann -pro ALL_DEG -inf ./example/sample.list -out ./example_out/ **
+
+*(Note: To merge count files, you can still run COMPASS in a pipeline.)*
+
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -fun -fm -fms 1-12 -fdclass 1,2,3,4,5,6 -fdann -pro ALL_MERGE -inf ./example/sample.list -out ./example_out/ **
+
+### 3.2.3 Microbe Module (Optional)
+
+*(Note: To run Microbe Module, you may need to download more resources. Here, we take archaea as an example.)*
+
+Step 1: Download and install BLAST.
+
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck blast **
+
+Step 2: Download taxonomy information.
+
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck blast_taxonomy **
+
+Step 3: Download microbial prebuilt database. In COMPASS, we have prebuilt four microbial databases: blast_archaea, blast_bacteria, blast_fungi, blast_viruses.
+
+**~/COMPASS$ java -jar COMPASS.jar -tk -dr -ck blast_archaea **
+
+Step 4: Run Microbe Module in COMPASS with -mic.
+
+**~/COMPASS$ java -jar COMPASS.jar -mic -mtool Blast -mdb archaea -in ./example_out/sample01/sample01_17to50_FitRead_STAR_Aligned_UnMapped.bam -out ./example_out/ **
+
+*(Note: You can still add the Microbe Module into the whole pipeline.)*
+
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -mic -mtool Blast -mdb archaea -in ./example/sample01.fastq -out ./example_out/ **
+
+*(Note: For multiple samples, take a file list as input. )*
+
+**~/COMPASS$ java -jar COMPASS.jar -ref hg38 -qc -ra TGGAATTCTCGGGTGCCAAGG -rb 4 -rh 20 -rt 20 -rr 20 -rlh 8,17 -aln -mt star -ann -ac 1,2,3,4,5,6 -mic -mtool Blast -mdb archaea -inf ./example/sample.list -out ./example_out/ **
 
 ## 4 Options
 
@@ -111,7 +241,7 @@ To remove n bases from the 5’ (5-prime) end.
 
 **To remove n bases from the 3’ (3-prime) end.**
 
-**4.2.9 -rlh/-rm_read_hard D1;D2;...;Dn**
+**4.2.9 -rlh/-rm_read_hard D1,D2,...,Dn**
 
 To divide the reads into several groups according to [0,D1),[D1,D2),...,[Dn-1,Dn].
 
@@ -151,9 +281,9 @@ To set parameters of the aligner. The default settings for star/bowtie/bowtie2 a
 
 • bowtie2
 
-**4.3.4 -midx/-mapping_index R1;R2;...;Rn**
+**4.3.4 -midx/-mapping_index R1,R2,...,Rn**
 
-To set the read group that will be used for alignment. The default value is ”last” , which means the group with the longest reads. Otherwise, the number Rn denotes the index of region when setting the parameter -rlh/-rm_read_hard D1;D2;...;Dn.
+To set the read group that will be used for alignment. The default value is ”last” , which means the group with the longest reads. Otherwise, the number Rn denotes the index of region when setting the parameter -rlh/-rm_read_hard D1,D2,...,Dn.
 
 **4.3.5 -mref/-mapping_reference hg19/hg38**
 
@@ -165,7 +295,7 @@ To set the reference genome in alignment. The default value is the same as the p
 
 To open/close the annotation module.
 
-**4.4.2 -ac/-ann_class A1;A2;...;An**
+**4.4.2 -ac/-ann_class A1,A2,...,An**
 
 To set the small RNA categories that will be annotated. The index of small RNA is listed:
 - 1 miRNA
@@ -201,7 +331,7 @@ To open/close the microbe module.
 
 To set the tool that will be used for microbe profiling. Currently, only blast is supported.
 
-**4.5.3 -mdb/mic_database viruses;bacteria;fungi;archaea**
+**4.5.3 -mdb/mic_database viruses,bacteria,fungi,archaea**
 
 To set the microbial databases used in blast.
 
@@ -215,15 +345,15 @@ To open/close the function module.
 
 To open/close the function of differential expression analysis.
 
-**4.6.3 -fdclass/-fun_diff_class A1;A2;...;An**
+**4.6.3 -fdclass/-fun_diff_class A1,A2,...,An**
 
-To set the small RNAs that will be performed the differential expression analysis. The format is the same as the parameter -ac/-ann_class A1;A2;...;An.
+To set the small RNAs that will be performed the differential expression analysis. The format is the same as the parameter -ac/-ann_class A1,A2,...,An.
 
-**4.6.4 -fdcase/-fun_diff_case ID1;ID2;...;IDn**
+**4.6.4 -fdcase/-fun_diff_case ID1,ID2,...,IDn**
 
 To set the IDs of case samples.
 
-**4.6.5 -fdctrl/-fun_diff_control ID1;ID2;...;IDn**
+**4.6.5 -fdctrl/-fun_diff_control ID1,ID2,...,IDn**
 
 To set the IDs of control samples.
 
@@ -239,7 +369,7 @@ If added, COMPASS will detect the annotation files of microbes. It is valid when
 
 To set the tool that was used for microbe profiling. This parameter can facilitate COMPASS to decide the input files.
 
-**4.6.9 -fmdb/-fun_mdb viruses;bacteria;fungi;archaea**
+**4.6.9 -fmdb/-fun_mdb viruses,bacteria,fungi,archaea**
 
 To set the microbial databases used in blast. This parameter can facilitate COMPASS to decide the input files.
 
@@ -251,9 +381,9 @@ If added, COMPASS will detect the annotation files of all small RNAs. It is vali
 
 To open/close the function of merging.
 
-**4.6.12 -fms/-fun_merge_samples ID1;ID2;...;IDn**
+**4.6.12 -fms/-fun_merge_samples ID1,ID2,...,IDn**
 
-To extract read counts from each sample and merge them in one file by different kinds of small RNAs. The categories are set by the parameter -fdclass/-fun_diff_class A1;A2;...;An.
+To extract read counts from each sample and merge them in one file by different kinds of small RNAs. The categories are set by the parameter -fdclass/-fun_diff_class A1,A2,...,An.
 
 ## 5 FAQ
 
