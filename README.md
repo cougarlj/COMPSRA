@@ -260,6 +260,7 @@ To set the aligner used in COMPASS. The default aligner is star
 To set parameters of the aligner. The default settings for star/bowtie/bowtie2 are listed below:
 
 • star
+
 --runThreadN 4 
 --runMode alignReads  
 --outSAMtype BAM Unsorted  
