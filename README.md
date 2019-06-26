@@ -260,22 +260,23 @@ To set the aligner used in COMPASS. The default aligner is star
 To set parameters of the aligner. The default settings for star/bowtie/bowtie2 are listed below:
 
 • star
-–runMode alignReads
-–outSAMtype SAM
-–outSAMattributes Standard
-–readFilesCommand zcat
-–outSAMunmapped Within
-–outReadsUnmapped None
-–alignEndsType EndToEnd
-–alignIntroMax 1
-–alignIntroMin 21
-–outFilterMismatchNmax 1
-–outFilterMultimapScoreRange 0
-–outFilterScoreMinOverLread 0
-–outFilterMatchNminOverLread 0
-–outFilterMismatchNoverLmax 0.3
-–outFilterMatchNmin 16
-–outFilterMultimapNmax 20
+--runThreadN 4 
+--runMode alignReads  
+--outSAMtype BAM Unsorted  
+--outSAMattributes Standard  
+--readFilesCommand zcat  
+--outSAMunmapped Within  
+--outReadsUnmapped None  
+--alignEndsType Local 
+--alignIntronMax 1  
+--alignIntronMin 2  
+--outFilterMismatchNmax 1  
+--outFilterMultimapScoreRange 1  
+--outFilterScoreMinOverLread 0.66  
+--outFilterMatchNminOverLread 0.66  
+--outFilterMismatchNoverLmax 0.05  
+--outFilterMatchNmin 16  
+--outFilterMultimapNmax 1000000
 
 • bowtie
 
