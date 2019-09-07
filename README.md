@@ -22,7 +22,7 @@ genome hg19/hg38, and then aligned reads are quantified and annotated in the Ann
 ### 2.1 JAVA Virtual Machine
 COMPSRA was achieved by Java language, so Java Runtime Environment (JRE) version 8 (or up) is required. The JRE can be downloaded in ORACLE website (http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 ### 2.2 COMPSRA
-You can download COMPSRA from https://regepi.bwh.harvard.edu/circurna/ COMPASS_v1.0.zip or the GitHub website https://github.com/cougarlj/COMPSRA.
+You can download COMPSRA from https://regepi.bwh.harvard.edu/circurna/ COMPSRA_v1.0.zip or the GitHub website https://github.com/cougarlj/COMPSRA.
 ### 2.3 STAR
 COMPSRA will take STAR as the default aligner. STAR can be downloaded from Google Code (https://code.google.com/archive/p/rna-star/downloads). You can install STAR by yourself in the COMPSRA plug directory or by COMPSRA itself.
 ### 2.4 Build-in Installation System
@@ -45,15 +45,15 @@ When you installed the JAVA Virtual Machine and COMPSRA successfully, you could 
 
 #### 3.1.1 Download COMPSRA
 
-**~/COMPSRA$ wget https://regepi.bwh.harvard.edu/circurna/COMPASS_V1.0.zip**
+**~/COMPSRA$ wget https://regepi.bwh.harvard.edu/circurna/COMPSRA_V1.0.zip**
 
-**~/COMPSRA$ unzip COMPASS_V1.0.zip**
+**~/COMPSRA$ unzip COMPSRA_V1.0.zip**
 
 After uncompressing the zip file, you can find the following materials:
 
 -**COMPSRA.jar :** This is the compiled jar package of COMPSRA.
 
--**COMPASS_tutorial_v1.0.pdf :** The tutorial of COMPSRA v1.0.
+-**COMPSRA_tutorial_v1.0.pdf :** The tutorial of COMPSRA v1.0.
 
 -**bundle_v1 :** This directory contains all the resources that COMPSRA may used, such as databases, reference genome, plugs.
 
@@ -127,11 +127,11 @@ Annotation Module:
 
 Function Module:
 
-**~/COMPSRA$ java -jar COMPSRA.jar -ref hg38 -fun -fd -fdclass 1,2,3,4,5,6 -fdcase 1-6 -fdctrl 7-12 -fdnorm cpm -fdtest mwu -fdann -pro COMPASS_DEG -inf ./example/sample.list -out ./example_out/** 
+**~/COMPSRA$ java -jar COMPSRA.jar -ref hg38 -fun -fd -fdclass 1,2,3,4,5,6 -fdcase 1-6 -fdctrl 7-12 -fdnorm cpm -fdtest mwu -fdann -pro COMPSRA_DEG -inf ./example/sample.list -out ./example_out/** 
 
 *(Note: If you only want to merge the count files, you can use -fm -fms.)*
 
-**~/COMPSRA$ java -jar COMPSRA.jar -ref hg38 -fun -fm -fms 1-12 -fdclass 1,2,3,4,5,6 -fdann -pro COMPASS_MERGE -inf ./example/sample.list -out ./example_out/**
+**~/COMPSRA$ java -jar COMPSRA.jar -ref hg38 -fun -fm -fms 1-12 -fdclass 1,2,3,4,5,6 -fdann -pro COMPSRA_MERGE -inf ./example/sample.list -out ./example_out/**
 
 #### 3.2.2 Run COMPSRA in a pipeline
 
