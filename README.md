@@ -1,5 +1,5 @@
 # COMPSRA
-COMPSRA: a COMprehensive Platform for smAll RNA-Seq data AnalySis (v1.0)
+COMPSRA: a COMprehensive Platform for Small RNA-seq data AnalySis (v1.0)
 
 ## 1 Introduction
 
