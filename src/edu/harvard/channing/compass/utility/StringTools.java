@@ -6,6 +6,9 @@
 package edu.harvard.channing.compass.utility;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.util.regex.Matcher;
@@ -115,20 +118,44 @@ public class StringTools {
         for(byte b:byt) sb.append((char)b);
         return sb.toString();        
     }
+ 
+    public static int countUMI(List<String> lstReads) {
+        HashSet<String> setUMI=new HashSet();
+        for(int i=0;i<lstReads.size();i++){
+            String strUMI;
+            String[] strItems=lstReads.get(i).split("\\|");
+            if(strItems.length==1)  strUMI=strItems[0];
+            else    strUMI=strItems[1];
+            if(strUMI.equals("null"))   continue;
+            else{
+                setUMI.add(strUMI);
+            }
+        }
+        return setUMI.size();
+        
+    }    
     
     public static void main(String[] args) {
 //        String read1="CTGCTCCCTGGTGGTCTAGTGGTTAGGATTCGGCGCTCTTCGTGGAATTC"; //partly overlap. return 42
 //        String read2="CCACTCCTGACACCAGGGCTGGAATTCTCGGGTGCCAAGGTGGAATTCTC"; //totally overlap. return 19
 //        String read3="TCTTATAGAGGAGACAAGTCGTAACATGGTAAGTGTACTGGAAAGTGCAC"; //no overlap. return 0
-        String read4="TCCTGTACTGAGCTGCCCCGATGGAATTCTCGAGTGCCAAGGAACTCCAGT"; // one error in the middle. return 21
-        String read5="TCCTGTACTGAGCTGCCCCGACGGAATTCTCGGGTGCCAAGGAACTCCAGT"; // one error at the first base. return 21
-        String read6="AGTACTAATAGACCGAGGGCTTGACCTGGAATTCTCGGGTGCCAACGAACT"; //one error at the end. return 26
-        String read7="TCCTGTACTGAGCTGCCCCGATGGAATTCTCGGGTGTTAAGGAACTCCAGT"; // two error in the middle. return 21
-        String adapter="TGGAATTCTCGGGTGCCAAGG"; 
-        int index=FindLongestSuffix(read7,adapter,2);
-        System.out.println(index);
+//        String read4="TCCTGTACTGAGCTGCCCCGATGGAATTCTCGAGTGCCAAGGAACTCCAGT"; // one error in the middle. return 21
+//        String read5="TCCTGTACTGAGCTGCCCCGACGGAATTCTCGGGTGCCAAGGAACTCCAGT"; // one error at the first base. return 21
+//        String read6="AGTACTAATAGACCGAGGGCTTGACCTGGAATTCTCGGGTGCCAACGAACT"; //one error at the end. return 26
+//        String read7="TCCTGTACTGAGCTGCCCCGATGGAATTCTCGGGTGTTAAGGAACTCCAGT"; // two error in the middle. return 21
+//        String adapter="TGGAATTCTCGGGTGCCAAGG"; 
+//        int index=FindLongestSuffix(read7,adapter,2);
+//        System.out.println(index);
 //       String str="'ext': set(['GCF_000012825', 'GCF_000158335', 'GCF_000155815']), 'score': 3.0, 'clade': 's__Bacteroides_sp_4_3_47FAA', 'len': 729, 'taxon': 'k__Bacteria|p__Bacteroidetes|c__Bacteroidia|o__Bacteroidales|f__Bacteroidaceae|g__Bacteroides|s__Bacteroides_sp_4_3_47FAA'";
 //       getKV(str);
+
+        List lstTest=new ArrayList();
+        lstTest.add("HISEQ:824:HNVWHBCX2:1:1105:7844:69059|TGAACGAGACCA");
+        lstTest.add("HISEQ:824:HNVWHBCX2:1:1105:8220:69068|null");
+        lstTest.add("HISEQ:824:HNVWHBCX2:1:1105:8361:69082|ACCTCGTTCACC");
+        int intCount=countUMI(lstTest);
        System.out.println("HeHe");
     }
+
+
 }

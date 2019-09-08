@@ -77,7 +77,7 @@ public class SNPRecord {
         return this.chrom+":"+this.pos+":"+this.ref;
     }
     
-    public boolean callVariant(){
+    public boolean callVariant(boolean isGVT){
         Arrays.fill(this.bases, 0);
         for(char base:this.strPileUp.toCharArray()){
             switch(base){
@@ -93,25 +93,28 @@ public class SNPRecord {
             LOG.warn("Reference of the position: "+this.chrom+":"+this.pos+" was lost! It will not be considered!");
             return false;
         }
+        
         if(this.strPileUp.length()==bases[Configuration.BASEORDER.get(ref)]){
-            return false;
-        }else{
-            for(int i=0;i<bases.length;i++){
-                this.total+=bases[i];
-                if(Configuration.BASEORDERREV.get(i)!=this.ref){
-                    if(bases[i]!=0){
-                        this.variant+=bases[i];
-                        if(this.alt==null){
-                            this.alt=String.valueOf(Configuration.BASEORDERREV.get(i));
-                        }else{
-                            this.alt+=","+String.valueOf(Configuration.BASEORDERREV.get(i));
-                        }
+            if(!isGVT){
+                return false;
+            }            
+        }
+        
+        for (int i = 0; i < bases.length; i++) {
+            this.total += bases[i];
+            if (Configuration.BASEORDERREV.get(i) != this.ref) {
+                if (bases[i] != 0) {
+                    this.variant += bases[i];
+                    if (this.alt == null) {
+                        this.alt = String.valueOf(Configuration.BASEORDERREV.get(i));
+                    } else {
+                        this.alt += "," + String.valueOf(Configuration.BASEORDERREV.get(i));
                     }
                 }
             }
-            this.rate=(float)this.variant/(float)this.total;           
-            return true;
         }
+        this.rate = (float) this.variant / (float) this.total;
+        return true;
     }
     
     public String getVariant(){
@@ -122,7 +125,11 @@ public class SNPRecord {
         sb.append("\t");
         sb.append(this.ref);
         sb.append("\t");
-        sb.append(this.alt);
+        if(this.alt==null){
+            sb.append(".");
+        }else{
+            sb.append(this.alt);
+        }        
         sb.append("\t");
         sb.append(this.total);
         sb.append("\t");
@@ -188,5 +195,4 @@ public class SNPRecord {
         this.rate = (float) this.variant / (float) this.total;
 
     }
-    
 }

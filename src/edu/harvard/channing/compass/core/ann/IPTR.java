@@ -46,6 +46,7 @@ public abstract class IPTR {
     public boolean needBAMOutput=false;
     public SAMFileWriter sfwSpecialRNA;
     public boolean needDetail=false;
+    public boolean useUMI=false;
     
     IPTR(String strFile){
         this.strOutput=strFile;
@@ -127,12 +128,12 @@ public abstract class IPTR {
                     for(DBLeaf dif : dis.hmpDB.get(key).get(pos)){
                         //Have annotation.
                         if(dif.hit>0){
-//                            if("SNORD94".equals(dif.name)){
-//                                System.out.println(dif.toRecord());
+//                            if("hsa-miR-223-3p".equals(dif.name)){
+//                                System.out.println(dif.getRecord(intThreshold));
 //                            }
                             dif.db=dis.strDB;
 //                            dbtMerge.graftLeafByLocation(dif,this.fltOverlapRateRegion);
-                            dbtMerge.graftLeafByIdentifier(dif,true);
+                            dbtMerge.graftLeafByIdentifier(dif,true,this.useUMI);
                         }
                     }                 
                 }

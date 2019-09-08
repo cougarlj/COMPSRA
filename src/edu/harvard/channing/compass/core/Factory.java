@@ -46,6 +46,7 @@ import edu.harvard.channing.compass.core.mut.Genome;
 import edu.harvard.channing.compass.core.mut.HumanGenome;
 import edu.harvard.channing.compass.db.DB_Ensembl_snRNA;
 import edu.harvard.channing.compass.db.DB_pre_miRBase;
+import edu.harvard.channing.compass.entity.DBLeaf_GFF3;
 import edu.harvard.channing.compass.utility.LimitInputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -115,6 +116,7 @@ public class Factory {
         else if(key.startsWith("05"))   return new DBLeaf_snRNA();
         else if(key.startsWith("06"))   return new DBLeaf_circRNA();
         else if(key.startsWith("0002"))   return new DBLeaf_gencode();
+        else if(key.startsWith("-1"))   return new DBLeaf_GFF3();
         else    return new DBLeaf();       
     }
     

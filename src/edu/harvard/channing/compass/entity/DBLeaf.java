@@ -75,6 +75,14 @@ public class DBLeaf implements Serializable{
         if(rate>=overlap)   return true;
         else    return false;
     }
+    
+    public boolean within(int point){
+        if(point>=this.start && point<=this.end ){
+            return true;
+        }else{
+            return false;
+        }
+    }
     public void setCluster(boolean inCluster){
         //Only used in piRNA part.
     };

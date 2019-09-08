@@ -49,17 +49,10 @@ public class FileRecord {
     public String[] strDB;
     
 
-//    FileRecord(){
-//       this.output_qc=new ArrayList<String>();
-//       this.output_aln=new ArrayList<String>();
-//       this.output_aln=new ArrayList<String>();
-//       this.output_mic=new ArrayList<String>();
-//   }
-
     public FileRecord(String strInput) {              
         try {
-            this.input=strInput;
-            File fleInput=new File(strInput);
+            this.input=strInput.trim();
+            File fleInput=new File(strInput.trim());
             this.input=fleInput.getCanonicalPath();
             this.input_prefix=fleInput.getName().split("\\.")[0];
         } catch (IOException ex) {
@@ -68,9 +61,9 @@ public class FileRecord {
     }
 
     public void setOutput(String output) {
-        File fle = new File(output);
+        File fle = new File(output.trim());
         if(!fle.exists()){
-            if (output.endsWith("/") || output.endsWith("\\")) {
+            if (output.trim().endsWith("/") || output.trim().endsWith("\\")) {
                 try {
                     fle.mkdirs();
                     this.output_dir = fle.getCanonicalPath()+"/"+ this.input_prefix + "/";

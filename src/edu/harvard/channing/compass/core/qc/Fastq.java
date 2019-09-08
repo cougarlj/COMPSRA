@@ -33,10 +33,13 @@ public class Fastq implements Callable{
      * The default value is Phred+33, but the exact system should be set by user or estimated by the pipeline. To be improved. 
      */
     public int intPhred=33;
+    public String strInput;
+    public String strOutput;
     
     public BufferedReader brInput;
     public BufferedWriter[] bosOutputs;
     public HashMap<Integer,Integer> hmpReadLength;
+    public BufferedWriter bwOutput;
     public int intTotalRead=0;
     public int intRmBaseHead=0;
     public int intRmBaseTail=0;
@@ -67,6 +70,10 @@ public class Fastq implements Callable{
 //        strRecord=new String[intCount.length];
         
         this.frd.setQC(this);
+    }
+
+    public Fastq() {
+        
     }
     
     /**
@@ -239,6 +246,25 @@ public class Fastq implements Callable{
         else    return "File "+this.frd.input+" QC fail!";
     }
 
+    public void setInput(String strInput) {
+        if (strInput==null) {
+            LOG.info("QualityControl Info: The input file doesn't exist!");
+            return;
+        } else {
+            this.strInput=strInput;
+            this.brInput=Factory.getReader(this.strInput);
+        }
+    }
+
+    public void setOutput(String strOutput) {
+        this.strOutput=strOutput;
+        this.bwOutput=Factory.getWriter(strOutput);
+    }
+
+    public BufferedWriter getOutput() {
+        return this.bwOutput;
+    }
+
 
     /**
      * This class is used to provide QC function for reads. 
@@ -254,19 +280,20 @@ public class Fastq implements Callable{
         public boolean hasGoodQuality=true;
         
         public String[] strRead=new String[4];
+        public int intUMIDup=1;
 
         /**
          * This method is used to get the valid length of the read. If the length was not calculated, call setLength() to get it.
          * @return The valid length of the read.
          */
-        private int getLength(){
+        public int getLength(){
             if(this.intLength==-1)   this.setLength();
             return this.intLength;
         }
         /**
          * This method is used to set the valid length of the read.
          */
-        private void setLength(){
+        public void setLength(){
             this.intLength=this.intEnd-this.intStart;
             if(this.intLength<=0)    this.intLength=0;    
         }
@@ -274,7 +301,7 @@ public class Fastq implements Callable{
          * This method is used to get the valid sequence of the read. 
          * @return The valid read sequence.
          */
-        private String getSeq(){
+        public String getSeq(){
             if(this.intEnd<=this.intStart)  return null;
             else    return strRead[1].substring(this.intStart, this.intEnd);
         }
@@ -282,7 +309,7 @@ public class Fastq implements Callable{
          * This method is used to get the valid quality score of the read.
          * @return The valid quality score of read.
          */
-        private String getQuality(){
+        public String getQuality(){
             if(this.intEnd<=this.intStart)  return null;
             else    return strRead[3].substring(this.intStart,this.intEnd);
         }
@@ -290,7 +317,7 @@ public class Fastq implements Callable{
          * This method is used to remove N bases of the read directly from the head.
          * @param N The bases to be removed from the head.
          */
-        private void rmBaseHead(int N) {
+        public void rmBaseHead(int N) {
             this.intStart=this.intStart+N;
             intRmBaseHead++;
         }
@@ -298,7 +325,7 @@ public class Fastq implements Callable{
          * This method is used to remove N bases of the read directly from the tail.
          * @param N 
          */
-        private void rmBaseTail(int N) {
+        public void rmBaseTail(int N) {
             this.intEnd=this.intEnd-N;
             intRmBaseTail++;
         }
@@ -306,7 +333,7 @@ public class Fastq implements Callable{
          * This method is used to divide the reads into different groups according to the length region strRange.
          * @param strRange 
          */
-        private void rmLengthRead(String[] strRange) {
+        public void rmLengthRead(String[] strRange) {
             if(this.intLength==-1)  this.setLength();
             for(int i=0;i<strRange.length;i++){
                 if(this.intLength<Integer.valueOf(strRange[i])){
@@ -320,7 +347,7 @@ public class Fastq implements Callable{
          * This method is used to remove the bases with quality scores smaller than Q from the head.
          * @param Q 
          */
-        private void rmQualityHead(int Q) {
+        public void rmQualityHead(int Q) {
             int intBadBase=0;
 
             for(int i=this.intStart;i<this.intEnd;i++){
@@ -336,7 +363,7 @@ public class Fastq implements Callable{
          * This method is used to remove the bases with quality scores smaller than Q from the tail.
          * @param Q 
          */
-        private void rmQualityTail(int Q) {
+        public void rmQualityTail(int Q) {
             int intBadBase=0;
             for(int i=this.intEnd-1;i>=this.intStart;i--){
                 if((this.strRead[3].charAt(i)-intPhred)<Q) intBadBase++;
@@ -351,7 +378,7 @@ public class Fastq implements Callable{
          * This method is used to remove the reads with average quality scores smaller than Q.
          * @param Q 
          */
-        private void rmQualityRead(int Q) {
+        public void rmQualityRead(int Q) {
             int intTotalQ=0;
 
             int intN=0;
@@ -370,7 +397,7 @@ public class Fastq implements Callable{
          * This method is used to remove the 3'adapter. 
          * @param strAdapter The sequences of adapter.
          */
-        private void rmAdapter3prim(String strAdapter) {
+        public void rmAdapter3prim(String strAdapter) {
             int intPos=StringTools.FindLongestSuffix(this.strRead[1], strAdapter,intTolerance);
             if(intPos==0){
                 this.hasAdapter3Prim=false;
@@ -380,10 +407,48 @@ public class Fastq implements Callable{
             }
         }
         /**
+         * This method is used to find the position of 3'adapter.
+         * @param strAdapter 
+         */
+        
+        public int[] findAdapter3prim(String strAdapter){
+            int intPos=StringTools.FindLongestSuffix(this.strRead[1], strAdapter,intTolerance);
+            int[] intAdapter=new int[]{0,0};
+            if(intPos==0){
+                this.hasAdapter3Prim=false;
+                intAdapter[0]=intAdapter[1]=this.intEnd;
+            }else{
+                this.hasAdapter3Prim=true;
+                intAdapter[0]=intPos;
+                intAdapter[1]=intPos+strAdapter.length()-1;
+            }
+            return intAdapter;
+        }
+        
+        /**
+         * This method is used to extract the UMI Code from the read.
+         * @param strAdapter
+         * @param intUMI
+         * @return 
+         */
+        public String getUMICode(String strAdapter,int intUMI,int tolerance){
+            int[] intAdapter=this.findAdapter3prim(strAdapter);
+            if(!this.hasAdapter3Prim)   return null;
+            else if(this.intEnd-intAdapter[1]<=intUMI) return null;
+            else{
+                String strUMICode=this.strRead[1].substring(intAdapter[1]+1, intAdapter[1]+intUMI+1);
+                if(!this.isQualified(strUMICode,intUMI,tolerance)){
+                    strUMICode=null;
+                }
+                return strUMICode;              
+            }   
+        }
+        
+        /**
          * This method is used to remove the random bases attached to the adapter within the library preparation. 
          * @param N The random bases introduced within the library preparation especially for illumina platform.
          */
-        private void rmBias(int N) {
+        public void rmBias(int N) {
             this.intStart=this.intStart+N;
             this.intEnd=this.intEnd-N;
         }
@@ -402,6 +467,49 @@ public class Fastq implements Callable{
                 LOG.info("Fastq Error: Fail to write reads into files.");
             }        
         }      
+
+        public boolean betterThan(Read read2) {
+            if(this.sumQuality()>read2.sumQuality())    return true;
+            else    return false;
+        }
+        
+        public int sumQuality(){
+            int intScore=0;
+            for(byte i : this.getQuality().getBytes()){
+                intScore+=i;
+            }
+            return intScore;
+        }
+
+        public void addUMIMarker(String strUMICode) {
+            String[] strItem=this.strRead[0].split(" |\t");
+            String strNew=strItem[0]+"|"+strUMICode;
+            for(int i=1;i<strItem.length;i++){
+                strNew=strNew+" "+strItem[i];
+            }
+            this.strRead[0]=strNew;
+        }
+
+        public boolean isQualified(String strUMICode, int intUMI, int tolerance) {
+            if (strUMICode == null) {
+                return false;
+            }
+            if (strUMICode.length() < (intUMI - tolerance)) {
+                return false;
+            }
+            
+            int intN = 0;
+            for (char a : strUMICode.toCharArray()) {
+                if (a == 'N') {
+                    intN++;
+                }
+            }
+            if (intN > tolerance) {
+                return false;
+            }
+
+            return true;
+        }
     }
     
     

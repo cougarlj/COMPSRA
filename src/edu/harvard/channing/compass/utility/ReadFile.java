@@ -439,6 +439,47 @@ public class ReadFile {
         return dis;
     }
 
+    public static DBTree readGFF3(String input) {
+        String db = "Temp";
+        BufferedReader br;
+        DBTree dbt = new DBTree();
+        File fleIn = new File(input);
+
+        if (!fleIn.exists()) {
+            LOG.info("Read File Error: Fail to read file: " + input + ".");
+        } else {
+            try {
+                br = Factory.getReader(input);
+                String strLine;
+                dbt.initTree(db);
+
+                while ((strLine = br.readLine()) != null) {
+                    if (strLine.startsWith("#")) {
+                        continue;
+                    }
+//                    String[] strCol=strLine.split("\t");
+                    DBLeaf dif = Factory.createLeaf("-1");
+                    dif.initLeaf(strLine, "-1");
+                    boolean flag = dbt.addLeaf(dif.chr, dif);
+                    if (!flag) {
+                        System.out.println("Duplicated: " + dif.toRecord());
+                    }
+                }
+            } catch (FileNotFoundException ex) {
+                LOG.error(ex.getMessage());
+            } catch (IOException ex) {
+                LOG.error(ex.getMessage());
+            }
+        }
+
+        for (ArrayList<Integer> alt : dbt.hmpStart.values()) {
+            Collections.sort(alt);
+        }
+
+        return dbt;
+    }    
+    
+    
     public static HashMap<String, Marker> readMarker() {
         HashMap<String, Marker> bio = new HashMap<String, Marker>();
         try {

@@ -5,6 +5,7 @@
  */
 package edu.harvard.channing.compass.entity;
 
+import edu.harvard.channing.compass.utility.StringTools;
 import htsjdk.samtools.SAMRecord;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -133,29 +134,72 @@ public class DBTree implements Serializable{
 //                System.out.println();
 //            }
             boolHit=this.extendLeaf(idx, sr, overlap, hit);
-//            boolHit=this.hitLeaf(sr, sr.getStart(), overlap, hit);
+//            sbHit=this.hitLeaf(sr, sr.getStart(), overlap, hit);
             
         }else{
             //Within two branches.
             idx=-idx-1;
             if(idx==0){
-//                boolHit|=this.hitLeaf(sr, this.hmpStart.get(sr.getContig()).get(0), overlap, hit);
+//                sbHit|=this.hitLeaf(sr, this.hmpStart.get(sr.getContig()).get(0), overlap, hit);
                 boolHit=this.extendLeaf(0, sr, overlap, hit);
             }else if(idx==this.hmpStart.get(sr.getContig()).size()){
-//                boolHit|=this.hitLeaf(sr, this.hmpStart.get(sr.getContig()).get(this.hmpStart.get(sr.getContig()).size()-1), overlap, hit);
+//                sbHit|=this.hitLeaf(sr, this.hmpStart.get(sr.getContig()).get(this.hmpStart.get(sr.getContig()).size()-1), overlap, hit);
                 boolHit=this.extendLeaf(idx-1, sr, overlap, hit);
             }else{
 //                if (this.hmpStart.get(sr.getContig()).get(idx) == 70789509 || this.hmpStart.get(sr.getContig()).get(idx - 1) == 70789509) {
 //                    System.out.println();
 //                }
                   boolHit=this.extendLeaf(idx, sr, overlap, hit);          
-//                boolHit|=this.hitLeaf(sr,this.hmpStart.get(sr.getContig()).get(idx-1),overlap, hit);
-//                boolHit|=this.hitLeaf(sr,this.hmpStart.get(sr.getContig()).get(idx),overlap, hit);
+//                sbHit|=this.hitLeaf(sr,this.hmpStart.get(sr.getContig()).get(idx-1),overlap, hit);
+//                sbHit|=this.hitLeaf(sr,this.hmpStart.get(sr.getContig()).get(idx),overlap, hit);
             }           
         }
         
         return boolHit;
     }
+
+    public String findLeaf(String chrom,int pos){
+        StringBuilder sbHit=new StringBuilder();
+        int idx=0;
+        
+        try {
+            idx= Collections.binarySearch(this.hmpStart.get(chrom), pos);
+        } catch (NullPointerException e) {
+            return null;
+        }  
+        
+        if(idx>=0){
+            sbHit.append(this.extendLeaf(chrom,idx,pos));
+            sbHit.append(",");
+//            sbHit=this.hitLeaf(sr, sr.getStart(), overlap, hit);
+            
+        } else {
+            //Within two branches.
+            idx = -idx - 1;
+            String strTmp=null;
+            if (idx == 0) {
+                strTmp=this.extendLeaf(chrom, 0, pos);
+                if(strTmp!=null){
+                    sbHit.append(strTmp);
+                    sbHit.append(",");
+                }               
+            } else if (idx == this.hmpStart.get(chrom).size()) {
+                strTmp=this.extendLeaf(chrom, idx - 1, pos);
+                if(strTmp!=null){
+                sbHit.append(strTmp);
+                sbHit.append(",");}
+            } else {
+                strTmp=this.extendLeaf(chrom, idx, pos);
+                if(strTmp!=null){
+                sbHit.append(strTmp);
+                sbHit.append(",");}
+            }
+        }
+        
+        if(sbHit.length()==0)   return null;
+        else    return sbHit.substring(0,sbHit.length()-1);
+    }
+ 
     
     /**
      * This function will be called by class IPTR_piRNA. 
@@ -225,6 +269,22 @@ public class DBTree implements Serializable{
         return boolHit;
     }
 
+    public String hitLeaf(String chrom,int pos,int end){
+        StringBuilder sbHit = new StringBuilder();
+        ArrayList<DBLeaf> alt = this.hmpDB.get(chrom).get(pos);
+        for (int i = 0; i < alt.size(); i++) {
+            if (alt.get(i).within(end)) {
+                sbHit.append(alt.get(i).name);
+                sbHit.append(",");
+            }            
+        }
+        if(sbHit.length()==0){
+//            System.out.println(alt.get(0).name);
+            return null;
+        }
+        else    return sbHit.substring(0, sbHit.length()-1);
+    }    
+    
     /**
      * This function will be called in function graftLeafByLocation. 
      * @param dif
@@ -300,27 +360,41 @@ public class DBTree implements Serializable{
 //        }
     }
     
-    public void graftLeafByIdentifier(DBLeaf dif, boolean flag) {
+    public void graftLeafByIdentifier(DBLeaf dif, boolean flag, boolean useUMI) {
         if (flag) {
             if (this.hmpMerge.keySet().contains(dif.name)) {
                 DBLeaf tmp = this.hmpMerge.get(dif.name);
                 tmp.lstReads = (List) CollectionUtils.union(tmp.lstReads, dif.lstReads);
-                tmp.hit = tmp.lstReads.size();
+                if(useUMI){
+                    tmp.hit=StringTools.countUMI(tmp.lstReads);
+                }else{
+                    tmp.hit = tmp.lstReads.size();
+                }               
                 if(!tmp.db.contains(dif.db)) tmp.db=tmp.db+"|"+dif.db;
                 if(tmp.derives_from!=null)  tmp.derives_from=tmp.derives_from+"|"+dif.derives_from;
             } else {
+                if(useUMI){
+                    dif.hit=StringTools.countUMI(dif.lstReads);
+                }
                 this.hmpMerge.put(dif.name, dif);
             }
         } else {
             if ("-".equals(dif.other)) {
-                this.graftLeafByIdentifier(dif, true);
+                this.graftLeafByIdentifier(dif, true,useUMI);
             } else {
                 if (this.hmpMerge.keySet().contains(dif.other)) {
                     DBLeaf tmp = this.hmpMerge.get(dif.other);
                     tmp.lstReads = (List) CollectionUtils.union(tmp.lstReads, dif.lstReads);
-                    tmp.hit = tmp.lstReads.size();
+                    if (useUMI) {
+                        tmp.hit = StringTools.countUMI(tmp.lstReads);
+                    } else {
+                        tmp.hit = tmp.lstReads.size();
+                    }
                     if(!tmp.db.contains(dif.db)) tmp.db=tmp.db+"|"+dif.db;
                 } else {
+                    if (useUMI) {
+                        dif.hit = StringTools.countUMI(dif.lstReads);
+                    }
                     this.hmpMerge.put(dif.other, dif);
                 }
             }
@@ -333,11 +407,15 @@ public class DBTree implements Serializable{
      * @param dif The DBLeaf will be grafted. 
      * @param strKey The key used to index the DBLeaf. 
      */
-    public void graftLeafByIdentifier(DBLeaf dif, String strKey) {
+    public void graftLeafByIdentifier(DBLeaf dif, String strKey,boolean useUMI) {
         if (this.hmpMerge.keySet().contains(strKey)) {
             DBLeaf tmp = this.hmpMerge.get(strKey);
             tmp.lstReads = (List) CollectionUtils.union(tmp.lstReads, dif.lstReads);
-            tmp.hit = tmp.lstReads.size();
+            if (useUMI) {
+                tmp.hit = StringTools.countUMI(tmp.lstReads);
+            } else {
+                tmp.hit = tmp.lstReads.size();
+            }
             if (!tmp.db.contains(dif.db)) {
                 tmp.db = tmp.db + "|" + dif.db;
             }
@@ -362,7 +440,7 @@ public class DBTree implements Serializable{
             if(pos>=sr.getEnd())    break;
 //            ArrayList<DBLeaf> altLeaf=this.hmpDB.get(sr.getContig()).get(pos);
 //            for(DBLeaf dif : altLeaf){
-//                boolHit|=this.hitLeaf(sr, pos, overlap, hit);
+//                sbHit|=this.hitLeaf(sr, pos, overlap, hit);
 //            }
             boolHit|=this.hitLeaf(sr, pos, overlap, hit);
         }
@@ -379,7 +457,7 @@ public class DBTree implements Serializable{
 //                }              
                 isOverlapped|=(dif.end>sr.getStart());
                 isCovered&=dif.isCovered;
-//                boolHit|=this.hitLeaf(sr, pos, overlap, hit);
+//                sbHit|=this.hitLeaf(sr, pos, overlap, hit);
             }
             
             if(isOverlapped){
@@ -392,6 +470,48 @@ public class DBTree implements Serializable{
         return boolHit;
     }
 
+    public String extendLeaf(String chrom, int idx ,int end){
+        StringBuilder sbHit=new StringBuilder();
+        //Right Direction. [...)  
+        ArrayList<Integer> altPos=this.hmpStart.get(chrom);
+        for(int i=idx;i<altPos.size();i++){
+            int pos=altPos.get(i);
+            if(pos>end)    break;
+            String strTmp=this.hitLeaf(chrom, pos, end);
+            if (strTmp != null) {
+                sbHit.append(strTmp);
+                sbHit.append(",");
+            }
+        }
+        
+        //Left Direction. To annotate the node up to the independent one.   
+        for(int i=idx-1;i>=0;i--){
+            int pos=altPos.get(i);
+            ArrayList<DBLeaf> altLeaf=this.hmpDB.get(chrom).get(pos);
+            boolean isOverlapped=false;
+            boolean isCovered=true;
+            for(DBLeaf dif: altLeaf){
+         
+                isOverlapped|=(dif.end>end);
+                isCovered&=dif.isCovered;
+
+            }
+            
+            if (isOverlapped) {
+                String strTmp = this.hitLeaf(chrom, pos, end);
+                if (strTmp != null) {
+                    sbHit.append(strTmp);
+                    sbHit.append(",");
+                }
+            }
+            
+            if(!isCovered)   break;
+            
+        }
+        if(sbHit.length()==0)   return null;
+        else    return sbHit.substring(0, sbHit.length()-1);
+    }
+    
     public StringBuilder getReport() {
 
         int totalAnn=0;

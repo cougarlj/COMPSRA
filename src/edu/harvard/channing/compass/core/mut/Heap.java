@@ -71,7 +71,7 @@ public class Heap {
             }
 
             if (needClip) {
-                //To be think aoubt it. 
+                //Some microRNAs have 3' end modification, but currently we don't focus on this part of work.
             } else {
                 List<AlignmentBlock> lstAB = srdRead.getAlignmentBlocks();
                 byte[] bytRead = srdRead.getReadBases();
@@ -143,19 +143,26 @@ public class Heap {
         }
     }
     
-    public boolean callVariant(){
+    public boolean callVariant(boolean isGVT){
         try {
             if(this.altSNP==null){
                 LOG.error("Please pile up the SAM/BAM file first!");
                 return false;
             }
-            String strOut = this.strFile.split("\\.")[0] + ".vt";
+            
+            String strOut;
+            if(isGVT){
+                strOut = this.strFile.split("\\.")[0] + ".gvt";
+            }else{
+                strOut = this.strFile.split("\\.")[0] + ".vt";
+            }
+            
             BufferedWriter bw = Factory.getWriter(strOut);
             bw.write(SNPRecord.getVariantHead());
             bw.newLine();
             
             for(SNPRecord snpr:this.altSNP){
-                if(snpr.callVariant()){                  
+                if(snpr.callVariant(isGVT)){                  
                         bw.write(snpr.getVariant());
                         bw.newLine();               
                 }

@@ -30,7 +30,7 @@ public class Blast extends MicTool{
 //    public String strFmt=" -outfmt \"6 qacc sacc evalue sstrand bitscore length pident nident qstart qend sstart send \"";
     public String strFmt=" -outfmt 6";
     public int intThread=4;
-    public double dblEValue=0.001;
+    public double dblEValue=0.000001;
     
 
     public Blast(String strIn, String strOut) {

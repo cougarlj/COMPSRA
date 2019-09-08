@@ -6,7 +6,11 @@
 package edu.harvard.channing.compass.core.aln;
 
 import edu.harvard.channing.compass.core.Configuration;
+import edu.harvard.channing.compass.core.Factory;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,9 +25,9 @@ public class Aligner_STAR extends Aligner{
     private static final Logger LOG = LogManager.getLogger(Aligner_STAR.class.getClass());
     String strToolName="star";
     String strToolPath;
-//    String strToolParam="--runThreadN 4 --alignEndsType EndToEnd --outFilterMismatchNmax 1 --outFilterMultimapScoreRange 0 --outSAMtype SAM --outFilterMultimapNmax 20 --outSAMunmapped Within --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMatchNmin 16 --alignIntronMax 1 --readFilesCommand zcat ";
+    
     //In default, COMPASS follow the exceRpt settings. 
-    String strToolParam="--runThreadN 4 --runMode alignReads  --outSAMtype BAM Unsorted  --outSAMattributes Standard  --readFilesCommand zcat  --outSAMunmapped Within  --outReadsUnmapped None  --alignEndsType Local  --alignIntronMax 1  --alignIntronMin 2  --outFilterMismatchNmax 10  --outFilterMultimapScoreRange 1  --outFilterScoreMinOverLread 0.66  --outFilterMatchNminOverLread 0.66  --outFilterMismatchNoverLmax 0.05  --outFilterMatchNmin 16  --outFilterMultimapNmax 1000000";
+    String strToolParam="--runThreadN 4 --runMode alignReads  --outSAMtype BAM Unsorted  --outSAMattributes Standard  --readFilesCommand zcat  --outSAMunmapped Within  --outReadsUnmapped None  --alignEndsType Local --outFilterMismatchNmax 1 --alignIntronMax 1  --alignIntronMin 2 --outFilterMultimapScoreRange 1  --outFilterScoreMinOverLread 0.66  --outFilterMatchNminOverLread 0.66  --outFilterMismatchNoverLmax 0.05  --outFilterMatchNmin 16  --outFilterMultimapNmax 1000000";
     
     public Aligner_STAR(String in, String out) {
         //input: HBRNA_AGTCAA_L001_R1_test_8to17_FitRead.fastq.gz
@@ -80,6 +84,40 @@ public class Aligner_STAR extends Aligner{
             LOG.error("Fail to build index for "+strRef);
             System.exit(1);
         }
+    }
+    
+    @Override
+    public void setParam(String strParam) {
+        if(strParam==null)  return;
+        ArrayList <String> altParam=new ArrayList();
+        BufferedReader br=Factory.getReader(Configuration.STAR_PARAM);
+        if(br==null){
+            this.strParam=null;
+            return;                
+        }else{
+            try {
+                for(String strLine=br.readLine();strLine!=null;strLine=br.readLine()){
+                    altParam.add(strLine.trim());                  
+                }
+            } catch (IOException ex) {
+                LOG.error("Fail to read the STAR parameter file: "+Configuration.STAR_PARAM);
+                this.strParam=null;
+                return;
+            }
+        }
+        
+        try{
+            int intIdx=Integer.valueOf(strParam);
+            if(intIdx>altParam.size()){
+                this.strParam=null;
+            }else{
+                this.strParam=altParam.get(intIdx);
+            }
+        }catch(Exception ex){
+            LOG.error("STAR parameter index error. The default parameter is used.");
+            this.strParam=null;
+        }       
+        
     }
     
 }

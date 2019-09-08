@@ -15,6 +15,8 @@ import edu.harvard.channing.compass.toolkit.Adapter;
 import edu.harvard.channing.compass.entity.CommonParameter;
 import edu.harvard.channing.compass.toolkit.CallVariant;
 import edu.harvard.channing.compass.toolkit.DownloadResource;
+import edu.harvard.channing.compass.toolkit.ExtractSNV;
+import edu.harvard.channing.compass.toolkit.UMI;
 import edu.harvard.channing.compass.toolkit.Fasta;
 import edu.harvard.channing.compass.toolkit.SingleAnn;
 import edu.harvard.channing.compass.toolkit.Taxonomy;
@@ -114,6 +116,7 @@ public class Option {
         options.addOption("armsm","ann_remove_sam",false,"Remove the sam file with reads mapped to the genome. (Default value is false.)");
         options.addOption("abam","ann_bam",false,"Output bam files for each kind of RNA. (Default value is fasle.)");
         options.addOption("asu","ann_show_unann",false,"Output the alignments without annotations. (Default value is false.)");
+        options.addOption("aumi","ann_umi",false,"Use UMI reads for annotation.");
         
         //Set Microbe options. 
         options.addOption("mic","microbe",false,"Open the microbe module.");
@@ -160,7 +163,7 @@ public class Option {
         options.addOption("redup","reduplication",false,"Remove the duplicated items in the fasta file.");
         options.addOption("idx","make_index",false,"Build index file and save as object.");
             //Adapter Inquiry.
-        options.addOption("adp","adapter",false,"Look up adapter sequence.");
+        options.addOption("adapter","adapter",false,"Look up adapter sequence.");
             //SingleAnn function.
         options.addOption("sa","single_ann",true,"Set one annotation. (e.g. chr2|176150329|176150351|+|hsa-miR-10b-5p|miRBase) ");
         options.addOption("sam","sam_input",true,"Set the input sam file.");
@@ -177,7 +180,24 @@ public class Option {
         options.addOption("ref","reference_version",true,"Set the reference genome version."); 
         options.addOption("inf","in_file",true,"To read the BAM/SAM files from a file.");
         options.addOption("merge","merge_vt_files",false,"To merge the variant files (*.vt)");
+        options.addOption("gvt","global_vt_files",false,"To output all alleles in the variant file (*.gvt)");
         options.addOption("out","out_file",true,"To set the output file full name.");
+            //ExtractSNV function.
+        options.addOption("extractSNV","extract_SNV",false,"Open the extract SNV function.");
+        options.addOption("vcf","extract_vcf",true,"The vcf file will be processed.");
+        options.addOption("db","target_db",true,"The database will be used for annotation.");
+        options.addOption("region","target_region",true,"The GFF3 file with region annotation.");
+        options.addOption("ref","ref_genome",true,"The version of reference genome");
+        options.addOption("out","out_file",true,"The output file path and name.");        
+            //UMI function.
+        options.addOption("UMI","Unified_Molecular_Identifier",false,"Open the UMI function.");
+        options.addOption("extract_umi","extract_umi",false,"Extract the reads with qualified umi codes.");
+        options.addOption("mark_umi","mark_umi",false,"Mark the reads with qualified umi codes.");
+        options.addOption("in","intput",true,"The fastq or fastq.gz file as input.");
+        options.addOption("adp3p","adapter_3prime",true,"The 3 prime end adapter sequences");
+        options.addOption("lumi","length_of_umi_code",true,"The length of UMI code. (The default value is 12.)");
+        options.addOption("tol","tolerance",true,"The missing value allowed in the UMI code.(The default value is 2.)");
+        options.addOption("out","out_file",true,"The output file path and name.");        
     }
     
     /**
@@ -272,7 +292,7 @@ public class Option {
                 }
                 
                 ptk.setTK(fa);
-            }else if(comm.hasOption("adp")){
+            }else if(comm.hasOption("adapter")){
                 Adapter adp=new Adapter();
                 ptk.setTK(adp);
             }else if(comm.hasOption("sa")){
@@ -321,10 +341,55 @@ public class Option {
                 if(comm.hasOption("merge")){
                     cv.needMerge=true;
                 }
+                if(comm.hasOption("gvt")){
+                    cv.isGVT=true;
+                }
                 if(comm.hasOption("out")){
                     cv.strOut=comm.getOptionValue("out");
                 }
                 ptk.setTK(cv);
+            }else if(comm.hasOption("extractSNV")){
+                ExtractSNV esnv=new ExtractSNV();
+                if (comm.hasOption("vcf")) {
+                    esnv.strVCF=comm.getOptionValue("vcf");
+                }
+                if (comm.hasOption("db")) {
+                    esnv.strDB=comm.getOptionValue("db");
+                }
+                if (comm.hasOption("region")) {
+                    esnv.strRegion=comm.getOptionValue("region");
+                }
+                if (comm.hasOption("ref")) {
+                    esnv.strRef=comm.getOptionValue("ref");
+                }
+                if(comm.hasOption("out")){
+                    esnv.strOut=comm.getOptionValue("out");
+                }
+                ptk.setTK(esnv);
+            }else if(comm.hasOption("UMI")){
+                UMI eumi=new UMI();
+                if(comm.hasOption("in")){
+                    eumi.strInput=comm.getOptionValue("in");
+                }
+                if(comm.hasOption("extract_umi")){
+                    eumi.boolExtract=true;
+                }
+                if(comm.hasOption("mark_umi")){
+                    eumi.boolMark=true;
+                }
+                if(comm.hasOption("adp3p")){
+                    eumi.strAdapter=comm.getOptionValue("adp3p");
+                }
+                if(comm.hasOption("lumi")){
+                    eumi.intUMI=Integer.valueOf(comm.getOptionValue("lumi"));
+                }
+                if(comm.hasOption("tol")){
+                    eumi.tolerance=Integer.valueOf(comm.getOptionValue("tol"));
+                }
+                if(comm.hasOption("out")){
+                    eumi.strOutput=comm.getOptionValue("out");
+                }
+                ptk.setTK(eumi);
             }
             return ptk;
         }        
@@ -517,6 +582,9 @@ public class Option {
             }
             if(comm.hasOption("asu")){
                 ann.boolShowUnAnn=true;
+            }
+            if(comm.hasOption("aumi")){
+                ann.useUMI=true;
             }
             
         } else {

@@ -58,7 +58,7 @@ public class IPTR_GENCODE extends IPTR{
                         //Have annotation.
                         if(dif.hit>0){
                             dif.db=dis.strDB;
-                            dbtMerge.graftLeafByIdentifier(dif,dif.id);
+                            dbtMerge.graftLeafByIdentifier(dif,dif.id,this.useUMI);
                         }
                     }                 
                 }

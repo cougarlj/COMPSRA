@@ -82,7 +82,7 @@ public class IPTR_piRNA extends IPTR {
 //                            }
                             dif.db=dis.strDB;
 //                            dbtMerge.graftLeafByLocation(dif,this.fltOverlapRateRegion);
-                            dbtMerge.graftLeafByIdentifier(dif,false);
+                            dbtMerge.graftLeafByIdentifier(dif,false,this.useUMI);
                         }
                     }                 
                 }

@@ -30,6 +30,7 @@ public class CallVariant implements ToolKit {
     public ArrayList<Heap> altHeap;
     public boolean needMerge=false;
     public String strOut;
+    public boolean isGVT=false;
     
     
     
@@ -55,7 +56,7 @@ public class CallVariant implements ToolKit {
                 heap.setRefGenome(this.strRefID);
                 heap.makeHeap();
                 heap.outputHeap();
-                heap.callVariant();
+                heap.callVariant(this.isGVT);
                 LOG.info(heap.strFile + " was set.");
             } catch (Exception ex) {
                 LOG.error(ex.getMessage());

@@ -36,6 +36,7 @@ public class Annotation {
     public int intTd=1;
     public boolean needBAMOutput=false;
     public boolean boolShowUnAnn=false;
+    public boolean useUMI=false;
 
     public Annotation(CommonParameter comParam) {
         this.comParam = comParam;
@@ -63,6 +64,7 @@ public class Annotation {
             ann.boolCR=this.comParam.boolCheckResource;
             ann.needBAMOutput=this.needBAMOutput;
             ann.boolShowUnAnn=this.boolShowUnAnn;
+            ann.useUMI=this.useUMI;
             
             Future<String> future = exe.submit(ann);
             lstResult.add(future);

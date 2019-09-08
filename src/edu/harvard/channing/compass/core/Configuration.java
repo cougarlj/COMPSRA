@@ -88,6 +88,10 @@ public final class Configuration {
      * hmpExoDatabase contains the database used in exogenous alignment.
      */
     public static HashMap<String, DatabaseInfo> hmpExoDatabase;
+    /**
+     * STAR_PARAM is used to save the parameters of STAR in different applications.
+     */
+    public static  String STAR_PARAM;
 
     /**
      * hmpAdapter contains the adapter sequence information that may be used in
@@ -116,6 +120,7 @@ public final class Configuration {
         Configuration.N_CPU = Runtime.getRuntime().availableProcessors();
 
         Configuration.STAR="STAR-2.5.3a.zip";
+        Configuration.STAR_PARAM=Configuration.CONFIG+"/STAR.para";
         Configuration.BLAST="ncbi-blast-2.7.1+-x64-linux.tar.gz";
         
 //        this.showLogo();
@@ -318,7 +323,7 @@ public final class Configuration {
 
     public void showModule() {
         System.out.println("\n+++++++++++++++++++++++++++++++");
-        System.out.println("+            COMPASS          +");
+        System.out.println("+            COMPSRA          +");
         System.out.println("+      (V1.0 2018-11-11)      +");
         System.out.println("+  rejia@channing.harvard.edu +");
         System.out.println("+++++++++++++++++++++++++++++++\n");

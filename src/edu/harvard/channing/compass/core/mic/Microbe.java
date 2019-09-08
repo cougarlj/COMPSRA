@@ -118,7 +118,7 @@ public class Microbe {
                 this.tomy.map2tree();
                 this.tomy.freshTree();
             }
-        }        
+        }
         return 1;
     }
     
