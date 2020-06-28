@@ -13,11 +13,14 @@ import edu.harvard.channing.compass.core.aln.Alignment;
 import edu.harvard.channing.compass.core.qc.QualityControl;
 import edu.harvard.channing.compass.toolkit.Adapter;
 import edu.harvard.channing.compass.entity.CommonParameter;
+import edu.harvard.channing.compass.toolkit.BuildDB;
 import edu.harvard.channing.compass.toolkit.CallVariant;
 import edu.harvard.channing.compass.toolkit.DownloadResource;
 import edu.harvard.channing.compass.toolkit.ExtractSNV;
+import edu.harvard.channing.compass.toolkit.FastAnnotation;
 import edu.harvard.channing.compass.toolkit.UMI;
 import edu.harvard.channing.compass.toolkit.Fasta;
+import edu.harvard.channing.compass.toolkit.Merge;
 import edu.harvard.channing.compass.toolkit.SingleAnn;
 import edu.harvard.channing.compass.toolkit.Taxonomy;
 import org.apache.commons.cli.CommandLine;
@@ -104,7 +107,7 @@ public class Option {
         options.addOption("mp","mapping_param",true,"Set the main parameters of the aligner.");
         options.addOption("midx","mapping_index",true,"Choose the files that were seperated by read length for alignment.(Default value is last, which means the files with the longest reads set.)");//"last" was default, for others are "1,2,4...". 
         options.addOption("mref","mapping_reference",true,"Set the reference genome for alignment. (Default value is hg38)");
-        options.addOption("mbi","mapping_build_index",false,"Build index for the input reference genome. Only needed in the first run.(This parameter was deprecated.)");
+        options.addOption("mbi","mapping_build_index",false,"Build index for the input reference genome. Only needed in the first run.");
 
         
         //Set Annotation options. 
@@ -141,7 +144,7 @@ public class Option {
         options.addOption("fm","fun_merge",false,"Merge all the samples according to differet categories.");
         options.addOption("fms","fun_merge_samples",true,"Set samples to be merged.");
         
-        //Set Toolkit options.
+            //Set Toolkit options.
         options.addOption("tk","toolkit",false,"Open the toolkit module.");
             //Taxonomy function.
         options.addOption("tax","taxon",false,"Open the taxonomy sub-module.");
@@ -178,9 +181,10 @@ public class Option {
         options.addOption("sam","sam_input",true,"Set the input sam/bam file.");
         options.addOption("gm","genome_fasta",true,"Set the input genome reference fasta/fa file.");
         options.addOption("ref","reference_version",true,"Set the reference genome version."); 
-        options.addOption("inf","in_file",true,"To read the BAM/SAM files from a file.");
-        options.addOption("merge","merge_vt_files",false,"To merge the variant files (*.vt)");
+        options.addOption("inf","in_files",true,"To read the BAM/SAM files from a file.");
+        options.addOption("merge","merge_vt_files",false,"To merge the variant files (*.gvt)");
         options.addOption("gvt","global_vt_files",false,"To output all alleles in the variant file (*.gvt)");
+        options.addOption("db","target_db",true,"The database will be used for annotation.");
         options.addOption("out","out_file",true,"To set the output file full name.");
             //ExtractSNV function.
         options.addOption("extractSNV","extract_SNV",false,"Open the extract SNV function.");
@@ -188,7 +192,14 @@ public class Option {
         options.addOption("db","target_db",true,"The database will be used for annotation.");
         options.addOption("region","target_region",true,"The GFF3 file with region annotation.");
         options.addOption("ref","ref_genome",true,"The version of reference genome");
-        options.addOption("out","out_file",true,"The output file path and name.");        
+        options.addOption("out","out_file",true,"The output file path and name.");     
+            //FastAnnotation function.
+        options.addOption("FastAnn","Fast_Annotation",false,"Open the fast annotationfunction.");
+        options.addOption("in","intput",true,"The file with two columns to be annotated (chrom pos).");
+        options.addOption("out","out_file",true,"The output file path and name."); 
+        options.addOption("db","target_db",true,"The database will be used for annotation.");
+        options.addOption("ref","ref_genome",true,"The version of reference genome");
+        options.addOption("gff3","gff3_ann",true,"The GFF3 file with region annotation.");
             //UMI function.
         options.addOption("UMI","Unified_Molecular_Identifier",false,"Open the UMI function.");
         options.addOption("extract_umi","extract_umi",false,"Extract the reads with qualified umi codes.");
@@ -197,7 +208,18 @@ public class Option {
         options.addOption("adp3p","adapter_3prime",true,"The 3 prime end adapter sequences");
         options.addOption("lumi","length_of_umi_code",true,"The length of UMI code. (The default value is 12.)");
         options.addOption("tol","tolerance",true,"The missing value allowed in the UMI code.(The default value is 2.)");
-        options.addOption("out","out_file",true,"The output file path and name.");        
+        options.addOption("out","out_file",true,"The output file path and name.");      
+            //Merge function.
+        options.addOption("inf","in_files",true,"To read the fastq files from a file.");
+        options.addOption("out","out_file",true,"The output file path and name.");
+        options.addOption("id","id_column",true,"The column of molecular/species name. (Start from 0)");
+        options.addOption("count","count_column",true,"The column of read count. (Start from 0)");
+            //Build built-in database.
+        options.addOption("build","build_db",false,"Build COMPSRA built-in database.");
+        options.addOption("in","input",true,"Annotation files for small RNAs, such as GFF3.");
+        options.addOption("db","target_db",true,"The name of annotation databae, such as miRBase.");
+        options.addOption("key","key_identifier",true,"The code registered in database_record.obj. ");
+        options.addOption("out","output",true,"The full name of the output obj file. This name should be ended with .obj.");
     }
     
     /**
@@ -344,6 +366,9 @@ public class Option {
                 if(comm.hasOption("gvt")){
                     cv.isGVT=true;
                 }
+                if(comm.hasOption("db")){
+                    cv.strDB=comm.getOptionValue("db");
+                }
                 if(comm.hasOption("out")){
                     cv.strOut=comm.getOptionValue("out");
                 }
@@ -390,6 +415,54 @@ public class Option {
                     eumi.strOutput=comm.getOptionValue("out");
                 }
                 ptk.setTK(eumi);
+            }else if(comm.hasOption("FastAnn")){
+                FastAnnotation fa = new FastAnnotation();
+                if (comm.hasOption("in")) {
+                    fa.strIn = comm.getOptionValue("in");
+                }
+                if (comm.hasOption("db")) {
+                    fa.strDB = comm.getOptionValue("db");
+                }
+                if (comm.hasOption("ref")) {
+                    fa.strRef = comm.getOptionValue("ref");
+                }
+                if (comm.hasOption("gff3")) {
+                    fa.strGFF3 = comm.getOptionValue("gff3");
+                }
+                if (comm.hasOption("out")) {
+                    fa.strOut = comm.getOptionValue("out");
+                }
+                ptk.setTK(fa);
+            } else if (comm.hasOption("merge")) {
+                Merge merge = new Merge();
+                if (comm.hasOption("inf")) {
+                    merge.strFile = comm.getOptionValue("inf");
+                }
+                if (comm.hasOption("out")) {
+                    merge.strOutput = comm.getOptionValue("out");
+                }
+                if (comm.hasOption("id")) {
+                    merge.intKey = Integer.valueOf(comm.getOptionValue("id"));
+                }
+                if (comm.hasOption("count")) {
+                    merge.intCount = Integer.valueOf(comm.getOptionValue("count"));
+                }
+                ptk.setTK(merge);
+            }else if(comm.hasOption("build")){
+                BuildDB bdb=new BuildDB();
+                if(comm.hasOption("in")){
+                    bdb.strIn=comm.getOptionValue("in");
+                }
+                if(comm.hasOption("out")){
+                    bdb.strOut=comm.getOptionValue("out");
+                }
+                if(comm.hasOption("db")){
+                    bdb.strDB=comm.getOptionValue("db");
+                }
+                if(comm.hasOption("key")){
+                    bdb.strKey=comm.getOptionValue("key");
+                }
+                ptk.setTK(bdb);
             }
             return ptk;
         }        
@@ -438,7 +511,7 @@ public class Option {
         if(comm.hasOption("pro")){
             comParam.strPro=comm.getOptionValue("pro");
         }else{
-            comParam.strPro="COMPASS";
+            comParam.strPro="COMPSRA";
         }
         
         if(comm.hasOption("cr")){

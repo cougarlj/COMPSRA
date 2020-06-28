@@ -119,7 +119,7 @@ public class ExtractSNV implements ToolKit{
                         sbLine.append("\t");
                         sbLine.append(point);
                         sbLine.append("\t");
-                        sbLine.append(strAnn);
+                        sbLine.append(sbAnn);
                         sbLine.append("\t");
                         sbLine.append(strCol[3]);
                         sbLine.append("\t");

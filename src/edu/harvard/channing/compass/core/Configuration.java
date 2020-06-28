@@ -185,6 +185,8 @@ public final class Configuration {
         STAR_REF.put("star_hg38", DB + "/star/hg38");
         STAR_REF.put("star_mm9", DB + "/star/mm9");
         STAR_REF.put("star_mm10", DB + "/star/mm10");
+        STAR_REF.put("star_rno5", DB+"/star/rno5");
+        STAR_REF.put("star_rno6", DB+"/star/rno6");
 
         //Set METAPHLAN
         METAPHLAN.put("marker", DB + "/MetaPhlAn/markers_info.txt.bz2");
@@ -324,7 +326,7 @@ public final class Configuration {
     public void showModule() {
         System.out.println("\n+++++++++++++++++++++++++++++++");
         System.out.println("+            COMPSRA          +");
-        System.out.println("+      (V1.0 2018-11-11)      +");
+        System.out.println("+     (V1.0.1 2020-06-26)     +");
         System.out.println("+  rejia@channing.harvard.edu +");
         System.out.println("+++++++++++++++++++++++++++++++\n");
     }
@@ -382,6 +384,7 @@ public final class Configuration {
         DOWNLOAD.put("hg38.fa.gz", "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz");
         DOWNLOAD.put("mm9.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/mm9.fa.gz");
         DOWNLOAD.put("mm10.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/mm10.fa.gz");
+        
         DOWNLOAD.put(BLAST, "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.7.1/"+BLAST);
         DOWNLOAD.put("nt_archaea.fasta.gz",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/nt_archaea.fasta.gz");
         DOWNLOAD.put("nt_bacteria.fasta.gz",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/nt_bacteria.fasta.gz");
@@ -1799,6 +1802,5 @@ public final class Configuration {
     
     public static void main(String[] args){
         Configuration config=new Configuration();
-
     }
 }

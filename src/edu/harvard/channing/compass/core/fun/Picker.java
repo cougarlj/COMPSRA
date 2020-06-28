@@ -32,7 +32,7 @@ public class Picker implements Callable{
     public HashMap<String,Integer> content;
     
     
-    Picker(String strInput, int intFirstKey, int intSecondKey, int intAssist, int intHit) {
+    public Picker(String strInput, int intFirstKey, int intSecondKey, int intAssist, int intHit) {
         this.strInput=strInput;
         this.intFirstKey=intFirstKey;
         this.intSecondKey=intSecondKey;

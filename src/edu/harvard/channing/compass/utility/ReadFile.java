@@ -344,7 +344,7 @@ public class ReadFile {
     /**
      * This function is used to read the gff3 annotation files.
      *
-     * @param key
+     * @param key The identifier of database. 
      * @param input The path of gff3 annotation file.
      * @return The DBTree object of this gff3 annotation file.
      */

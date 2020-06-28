@@ -31,7 +31,7 @@ public class HumanGenome extends Genome{
         super(strID);
     }
 
-    HumanGenome() {
+    public HumanGenome() {
         super();
     }
 

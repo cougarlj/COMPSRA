@@ -26,7 +26,7 @@ public class Aligner_STAR extends Aligner{
     String strToolName="star";
     String strToolPath;
     
-    //In default, COMPASS follow the exceRpt settings. 
+    //In default, COMPSRA follows the exceRpt settings, but not all the same. 
     String strToolParam="--runThreadN 4 --runMode alignReads  --outSAMtype BAM Unsorted  --outSAMattributes Standard  --readFilesCommand zcat  --outSAMunmapped Within  --outReadsUnmapped None  --alignEndsType Local --outFilterMismatchNmax 1 --alignIntronMax 1  --alignIntronMin 2 --outFilterMultimapScoreRange 1  --outFilterScoreMinOverLread 0.66  --outFilterMatchNminOverLread 0.66  --outFilterMismatchNoverLmax 0.05  --outFilterMatchNmin 16  --outFilterMultimapNmax 1000000";
     
     public Aligner_STAR(String in, String out) {
@@ -75,6 +75,10 @@ public class Aligner_STAR extends Aligner{
                 strFa=Configuration.STAR_REF.get("star_mm9")+"/mm9.fa.gz";
             }else if("mm10".equals(strRef)){
                 strFa=Configuration.STAR_REF.get("star_mm10")+"/mm10.fa.gz";
+            }else if("rno5".equals(strRef)){
+                strFa=Configuration.STAR_REF.get("star_rno5")+"/rn5.fa";
+            }else if("rno6".equals(strRef)){
+                strFa=Configuration.STAR_REF.get("star_rno6")+"/rn6.fa";
             }else{
                 strFa=null;
             }
@@ -114,7 +118,7 @@ public class Aligner_STAR extends Aligner{
                 this.strParam=altParam.get(intIdx);
             }
         }catch(Exception ex){
-            LOG.error("STAR parameter index error. The default parameter is used.");
+            LOG.warn("STAR parameter index error. The default parameter is used.");
             this.strParam=null;
         }       
         

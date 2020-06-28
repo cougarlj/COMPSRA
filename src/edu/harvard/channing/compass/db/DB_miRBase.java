@@ -49,13 +49,24 @@ public class DB_miRBase extends DB{
                 strKey = "01010202";
                 strObj=Configuration.BUNDLE_LOC+Configuration.hmpEndoDatabase.get(strKey).strLeafObj.split(";")[0];
                 break;
+            case "rno6":
+                strKey="01010301";
+                strObj=Configuration.BUNDLE_LOC+Configuration.hmpEndoDatabase.get(strKey).strLeafObj.split(";")[1];
+                break;
+            case "rno5":
+                strKey="01010302";
+                strObj=Configuration.BUNDLE_LOC+Configuration.hmpEndoDatabase.get(strKey).strLeafObj.split(";")[0];
+                break;            
             default:
                 if (strRef.contains("hg")) {
                     strKey = "01010101";
                     strLiftOver = ReadFile.getLiftOverFile("hg38", strRef);//Trans from "hg38" to refGenome.
-                } else {
+                } else if (strRef.contains("mm")) {
                     strKey = "01010201";
                     strLiftOver = ReadFile.getLiftOverFile("mm10", strRef);
+                }else{
+                    strKey="01010301";
+                    strLiftOver = ReadFile.getLiftOverFile("rno6", strRef);
                 }
                 needLiftOver = true;
                 LOG.info("LiftOver Info: " + strLiftOver + " is used!");

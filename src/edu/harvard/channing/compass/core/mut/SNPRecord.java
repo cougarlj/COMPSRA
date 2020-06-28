@@ -32,6 +32,7 @@ public class SNPRecord {
     String strPileUp;
     String sample;
     String key; //chr1:40754376:A
+    String ann="."; //hsa-miR-155-5p
 
     SNPRecord(String strContig, int intPos, char ref, String strBase) {
         this.chrom=strContig;
@@ -52,12 +53,13 @@ public class SNPRecord {
         String[] strItem=strLine.split("\t");
         this.chrom=strItem[0];
         this.pos=Integer.valueOf(strItem[1]);
-        this.ref=strItem[2].charAt(0);       
-        this.alt=strItem[3];
-        this.total=Integer.valueOf(strItem[4]);
-        this.variant=Integer.valueOf(strItem[5]);
-        this.rate=Float.valueOf(strItem[6]);
-        String[] base=strItem[7].split(",");
+        this.ann=strItem[2];
+        this.ref=strItem[3].charAt(0);       
+        this.alt=strItem[4];
+        this.total=Integer.valueOf(strItem[5]);
+        this.variant=Integer.valueOf(strItem[6]);
+        this.rate=Float.valueOf(strItem[7]);
+        String[] base=strItem[8].split(",");
         for(int i=0;i<5;i++){
             this.bases[i]=Integer.valueOf(base[i]);
         }
@@ -123,6 +125,8 @@ public class SNPRecord {
         sb.append("\t");
         sb.append(this.pos);
         sb.append("\t");
+        sb.append(this.ann);
+        sb.append("\t");
         sb.append(this.ref);
         sb.append("\t");
         if(this.alt==null){
@@ -150,7 +154,7 @@ public class SNPRecord {
     } 
     
     public static String getVariantHead(){
-        return "#chrom\tpos\tref\talt\ttotal\tvariant\trate\tA,C,G,T,N";
+        return "chrom\tpos\tann\tref\talt\ttotal\tvariant\trate\tA,C,G,T,N";
     }
 
     public String getVariant2() {
@@ -194,5 +198,9 @@ public class SNPRecord {
         }
         this.rate = (float) this.variant / (float) this.total;
 
+    }
+    
+    public void setAnn(String strAnn){
+        this.ann=strAnn;
     }
 }

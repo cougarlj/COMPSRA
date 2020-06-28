@@ -50,7 +50,7 @@ public class IPTR_miRNA extends IPTR {
         DB db=Factory.getDB("miRBase",this.boolCR);
         if(db!=null)   dbtForest.add(db.getForest(this.refGenome));        
                 
-        //Other database can be added as follows!
+        //Other databases can be added as follows!
         
         return true;
     }
@@ -163,10 +163,7 @@ public class IPTR_miRNA extends IPTR {
             
             ois = new ObjectInputStream(new GZIPInputStream(new FileInputStream(Configuration.strCurrDir+"/database/ann/miRBase/miRBase_"+miRNA.refGenome+".obj")));
             DBTree dbt = (DBTree) ois.readObject();
-            ois.close();   
-//            
-            
-            System.out.println("HeHeHeHe");
+            ois.close();              
         } catch (FileNotFoundException ex) {
             LOG.error(ex.getMessage());
         } catch (IOException ex) {
