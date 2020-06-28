@@ -1,6 +1,13 @@
 # COMPSRA
 COMPSRA: a COMprehensive Platform for Small RNA-seq data AnalySis (v1.0)
 
+## 0 Release Note
+
+### COMPSRA V1.0.1 (2020-06-28)
+
+- **Add prebuilt miRNA database for Rattus norvegicus.**
+- **Support both GCA_000001895.4/rno6 and GCA_000001895.3/rno5.**
+
 ## 1 Introduction
 
 COMPSRA was composed of five functional modules: **Quality Control**, **Alignment**, **Annotation**, **Microb**e and **Function**. They are integrated into a pipeline and each module can also process independently.
