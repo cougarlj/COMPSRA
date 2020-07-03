@@ -175,7 +175,7 @@ public class Option {
             //Download Resource.
         options.addOption("dr","download_resource",false,"Open the Download Resource toolkit.");
         options.addOption("ck","check",true,"Check the resources listed. If not existed locally, download them on net.");
-        options.addOption("lr","list",false,"List all URLs of resources in COMPASS.");
+        options.addOption("lr","list",false,"List all URLs of resources in COMPASRA.");
             //ASE function. 
         options.addOption("ase","allele_specific_expression",false,"Open the ASE function.");
         options.addOption("sam","sam_input",true,"Set the input sam/bam file.");

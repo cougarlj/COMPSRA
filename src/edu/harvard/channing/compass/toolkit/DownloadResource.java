@@ -64,8 +64,13 @@ public class DownloadResource implements ToolKit{
         hmpResource.put("miRNA_mm9", altTmp);        
         altTmp=new ArrayList();
         altTmp.add(new Download(Configuration.BUNDLE_LOC+Configuration.hmpEndoDatabase.get("01010201").strLeafObj.split(";")[1],false));//miRBase_mm10
-        hmpResource.put("miRNA_mm10", altTmp);        
-        
+        hmpResource.put("miRNA_mm10", altTmp);    
+        altTmp=new ArrayList();
+        altTmp.add(new Download(Configuration.BUNDLE_LOC+Configuration.hmpEndoDatabase.get("01010302").strLeafObj.split(";")[0],false));//miRBase_rno5
+        hmpResource.put("miRNA_rno5", altTmp);        
+        altTmp=new ArrayList();
+        altTmp.add(new Download(Configuration.BUNDLE_LOC+Configuration.hmpEndoDatabase.get("01010301").strLeafObj.split(";")[1],false));//miRBase_rno6
+        hmpResource.put("miRNA_rno6", altTmp);         
 
         altTmp=new ArrayList();
         altTmp.add(new Download(Configuration.BUNDLE_LOC+Configuration.hmpEndoDatabase.get("02010101").strLeafObj.split(";")[0],false));//piRNABank_hg18 -> piRNABank_hg19
@@ -160,7 +165,12 @@ public class DownloadResource implements ToolKit{
         altTmp=new ArrayList();
         altTmp.add(new Download(Configuration.STAR_REF.get("star_mm10")+"/mm10.fa.gz",false));
         hmpResource.put("star_mm10", altTmp);
-
+        altTmp=new ArrayList();
+        altTmp.add(new Download(Configuration.STAR_REF.get("star_rno5")+"/rn5.fa.gz",true));
+        hmpResource.put("star_rno5", altTmp);        
+        altTmp=new ArrayList();
+        altTmp.add(new Download(Configuration.STAR_REF.get("star_rno6")+"/rn6.fa.gz",true));
+        hmpResource.put("star_rno6", altTmp);
         
         //For Microbe Module.
         altTmp=new ArrayList();

@@ -384,6 +384,8 @@ public final class Configuration {
         DOWNLOAD.put("hg38.fa.gz", "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz");
         DOWNLOAD.put("mm9.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/mm9.fa.gz");
         DOWNLOAD.put("mm10.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/mm10.fa.gz");
+        DOWNLOAD.put("rn5.fa.gz", "ftp://hgdownload.soe.ucsc.edu/goldenPath/rn5/bigZips/rn5.fa.gz");
+        DOWNLOAD.put("rn6.fa.gz", "ftp://hgdownload.soe.ucsc.edu/goldenPath/rn6/bigZips/rn6.fa.gz");
         
         DOWNLOAD.put(BLAST, "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.7.1/"+BLAST);
         DOWNLOAD.put("nt_archaea.fasta.gz",DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/db/nt/nt_archaea.fasta.gz");

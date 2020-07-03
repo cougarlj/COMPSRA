@@ -68,13 +68,13 @@ public class Aligner_STAR extends Aligner{
             String strFa;
             if("hg19".equals(strRef)){
                 //Should be multiple chromosome files.
-                strFa=Configuration.STAR_REF.get("star_hg19")+"/hg19.fa.gz";
+                strFa=Configuration.STAR_REF.get("star_hg19")+"/hg19.fa";
             }else if("hg38".equals(strRef)){
                 strFa=Configuration.STAR_REF.get("star_hg38")+"/hg38.fa";
             }else if("mm9".equals(strRef)){
-                strFa=Configuration.STAR_REF.get("star_mm9")+"/mm9.fa.gz";
+                strFa=Configuration.STAR_REF.get("star_mm9")+"/mm9.fa";
             }else if("mm10".equals(strRef)){
-                strFa=Configuration.STAR_REF.get("star_mm10")+"/mm10.fa.gz";
+                strFa=Configuration.STAR_REF.get("star_mm10")+"/mm10.fa";
             }else if("rno5".equals(strRef)){
                 strFa=Configuration.STAR_REF.get("star_rno5")+"/rn5.fa";
             }else if("rno6".equals(strRef)){
