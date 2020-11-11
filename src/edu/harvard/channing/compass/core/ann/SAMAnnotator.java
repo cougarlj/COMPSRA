@@ -75,6 +75,7 @@ public class SAMAnnotator extends Annotator {
                     iptr[i].intThreshold=this.intTD;
                     iptr[i].boolCR=this.boolCR;
                     iptr[i].useUMI=this.useUMI;
+                    iptr[i].needDetail=this.needDetail;
                     if (!iptr[i].buildForest()) {
                         return "Annotation Error: Failed to prepare the database resource for " + iptr[i].getCategoryName() + "!";
                     }

@@ -714,6 +714,26 @@ public class ReadFile {
         }
         return altFiles;
     }
+    
+    public static HashMap<String,String> readFA(String key){
+        HashMap<String,String> hmpSEQ=new HashMap();
+        BufferedReader br = Factory.getReader(key);
+        String strLine;
+        
+        try {
+            while ((strLine = br.readLine()) != null) {
+                if (strLine.startsWith(">")) {
+                    String strID=strLine.split(" ")[0].substring(1);
+                    strLine=br.readLine().trim();
+                    hmpSEQ.put(strID, strLine);
+                }
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage());
+        }
+        
+        return hmpSEQ;
+    }
 
 
 }

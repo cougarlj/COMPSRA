@@ -6,8 +6,11 @@
 package edu.harvard.channing.compass.db;
 
 import edu.harvard.channing.compass.core.Configuration;
+import edu.harvard.channing.compass.core.Factory;
 import edu.harvard.channing.compass.entity.DBTree;
 import edu.harvard.channing.compass.utility.ReadFile;
+import java.io.BufferedReader;
+import java.util.HashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 public class DB_miRBase extends DB{
 
     private static final Logger LOG = LogManager.getLogger(DB_miRBase.class.getName()); 
-    
+    public HashMap<String,String> hmpSEQ;
     public DB_miRBase(String strName,boolean boolCR) {
         super(strName,boolCR);
     }
@@ -89,6 +92,9 @@ public class DB_miRBase extends DB{
             if(this.boolCR)    this.checkResource(strDB, false);         
             LOG.warn("The prebuilt database file "+this.strObj+" doesn't exist!");
             LOG.info("Try to build the database from local files "+strDB+" !");   
+            
+            //Add this part temporarily and will modify in new version.            
+            hmpSEQ=ReadFile.readFA("miRBase_v21");
                         
             if (needLiftOver) {
                 dbt=ReadFile.readGFF3(strKey, strLiftOver, strDB);

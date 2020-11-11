@@ -199,6 +199,33 @@ public class DBTree implements Serializable{
         if(sbHit.length()==0)   return null;
         else    return sbHit.substring(0,sbHit.length()-1);
     }
+    
+    public void findLeaf(String chrom, int pos, ArrayList<DBLeaf> altDBLeaf) {
+        int idx = 0;
+
+        try {
+            idx = Collections.binarySearch(this.hmpStart.get(chrom), pos);
+        } catch (NullPointerException e) {
+            altDBLeaf = null;
+            return;
+        }
+
+        if (idx >= 0) {
+            this.extendLeaf(chrom, idx, pos,altDBLeaf);
+        } else {
+            //Within two branches.
+            idx = -idx - 1;
+
+            if (idx == 0) {
+                this.extendLeaf(chrom, 0, pos, altDBLeaf);
+            } else if (idx == this.hmpStart.get(chrom).size()) {
+                this.extendLeaf(chrom, idx - 1, pos, altDBLeaf);
+            } else {
+                this.extendLeaf(chrom, idx, pos, altDBLeaf);
+            }
+        }
+
+    }
  
     
     /**
@@ -284,6 +311,15 @@ public class DBTree implements Serializable{
         }
         else    return sbHit.substring(0, sbHit.length()-1);
     }    
+    
+    public void hitLeaf(String chrom, int pos, int end, ArrayList<DBLeaf> altDBLeaf) {
+        ArrayList<DBLeaf> alt = this.hmpDB.get(chrom).get(pos);
+        for (int i = 0; i < alt.size(); i++) {
+            if (alt.get(i).within(end)) {
+                altDBLeaf.add(alt.get(i));
+            }
+        }
+    }
     
     /**
      * This function will be called in function graftLeafByLocation. 
@@ -511,6 +547,40 @@ public class DBTree implements Serializable{
         if(sbHit.length()==0)   return null;
         else    return sbHit.substring(0, sbHit.length()-1);
     }
+    
+    public void extendLeaf(String chrom, int idx, int end, ArrayList<DBLeaf> altDBLeaf) {
+
+        //Right Direction. [...)  
+        ArrayList<Integer> altPos = this.hmpStart.get(chrom);
+        for (int i = idx; i < altPos.size(); i++) {
+            int pos = altPos.get(i);
+            if (pos > end) {
+                break;
+            }
+            this.hitLeaf(chrom, pos, end, altDBLeaf);
+        }
+
+        //Left Direction. To annotate the node up to the independent one.   
+        for (int i = idx - 1; i >= 0; i--) {
+            int pos = altPos.get(i);
+            ArrayList<DBLeaf> altLeaf = this.hmpDB.get(chrom).get(pos);
+            boolean isOverlapped = false;
+            boolean isCovered = true;
+            for (DBLeaf dif : altLeaf) {
+                isOverlapped |= (dif.end > end);
+                isCovered &= dif.isCovered;
+            }
+
+            if (isOverlapped) {
+                this.hitLeaf(chrom, pos, end, altDBLeaf);
+            }
+
+            if (!isCovered) {
+                break;
+            }
+        }
+    }
+    
     
     public StringBuilder getReport() {
 

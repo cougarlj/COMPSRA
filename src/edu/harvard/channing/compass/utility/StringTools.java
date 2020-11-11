@@ -143,17 +143,19 @@ public class StringTools {
 //        String read5="TCCTGTACTGAGCTGCCCCGACGGAATTCTCGGGTGCCAAGGAACTCCAGT"; // one error at the first base. return 21
 //        String read6="AGTACTAATAGACCGAGGGCTTGACCTGGAATTCTCGGGTGCCAACGAACT"; //one error at the end. return 26
 //        String read7="TCCTGTACTGAGCTGCCCCGATGGAATTCTCGGGTGTTAAGGAACTCCAGT"; // two error in the middle. return 21
-//        String adapter="TGGAATTCTCGGGTGCCAAGG"; 
-//        int index=FindLongestSuffix(read7,adapter,2);
-//        System.out.println(index);
+        String read8="ACCACAACGGAATCCCAAAAGCAGCTGTGGTGGAATTCTCGGGTGCCAAG";
+        String adapter="TGGAATTCTCGGGTGCCAAGG"; 
+        int index=FindLongestSuffix(read8,adapter,2);
+        System.out.println(index);
+        
 //       String str="'ext': set(['GCF_000012825', 'GCF_000158335', 'GCF_000155815']), 'score': 3.0, 'clade': 's__Bacteroides_sp_4_3_47FAA', 'len': 729, 'taxon': 'k__Bacteria|p__Bacteroidetes|c__Bacteroidia|o__Bacteroidales|f__Bacteroidaceae|g__Bacteroides|s__Bacteroides_sp_4_3_47FAA'";
 //       getKV(str);
 
-        List lstTest=new ArrayList();
-        lstTest.add("HISEQ:824:HNVWHBCX2:1:1105:7844:69059|TGAACGAGACCA");
-        lstTest.add("HISEQ:824:HNVWHBCX2:1:1105:8220:69068|null");
-        lstTest.add("HISEQ:824:HNVWHBCX2:1:1105:8361:69082|ACCTCGTTCACC");
-        int intCount=countUMI(lstTest);
+//        List lstTest=new ArrayList();
+//        lstTest.add("HISEQ:824:HNVWHBCX2:1:1105:7844:69059|TGAACGAGACCA");
+//        lstTest.add("HISEQ:824:HNVWHBCX2:1:1105:8220:69068|null");
+//        lstTest.add("HISEQ:824:HNVWHBCX2:1:1105:8361:69082|ACCTCGTTCACC");
+//        int intCount=countUMI(lstTest);
        System.out.println("HeHe");
     }
 

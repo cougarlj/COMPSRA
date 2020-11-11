@@ -14,6 +14,7 @@ import edu.harvard.channing.compass.core.qc.QualityControl;
 import edu.harvard.channing.compass.toolkit.Adapter;
 import edu.harvard.channing.compass.entity.CommonParameter;
 import edu.harvard.channing.compass.toolkit.BuildDB;
+import edu.harvard.channing.compass.toolkit.BuildMutantDB;
 import edu.harvard.channing.compass.toolkit.CallVariant;
 import edu.harvard.channing.compass.toolkit.DownloadResource;
 import edu.harvard.channing.compass.toolkit.ExtractSNV;
@@ -23,6 +24,7 @@ import edu.harvard.channing.compass.toolkit.Fasta;
 import edu.harvard.channing.compass.toolkit.Merge;
 import edu.harvard.channing.compass.toolkit.SingleAnn;
 import edu.harvard.channing.compass.toolkit.Taxonomy;
+import edu.harvard.channing.compass.toolkit.TrackRead;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -118,8 +120,9 @@ public class Option {
         options.addOption("atd","ann_threshold",true,"Filter the count of reads. (Default value is 1.)");
         options.addOption("armsm","ann_remove_sam",false,"Remove the sam file with reads mapped to the genome. (Default value is false.)");
         options.addOption("abam","ann_bam",false,"Output bam files for each kind of RNA. (Default value is fasle.)");
-        options.addOption("asu","ann_show_unann",false,"Output the alignments without annotations. (Default value is false.)");
+        options.addOption("asu","ann_show_unann",false,"Output the un-annotated alignments. (Default value is false.)");
         options.addOption("aumi","ann_umi",false,"Use UMI reads for annotation.");
+        options.addOption("ad","ann_detail",false,"Show reads for each annotation.");
         
         //Set Microbe options. 
         options.addOption("mic","microbe",false,"Open the microbe module.");
@@ -142,8 +145,7 @@ public class Option {
         options.addOption("fdann","fun_diff_ann",false,"Detect the annotation files.(Used when only apply the functional module.)");
             //Merge Samples.
         options.addOption("fm","fun_merge",false,"Merge all the samples according to differet categories.");
-        options.addOption("fms","fun_merge_samples",true,"Set samples to be merged.");
-        
+        options.addOption("fms","fun_merge_samples",true,"Set samples to be merged.");        
             //Set Toolkit options.
         options.addOption("tk","toolkit",false,"Open the toolkit module.");
             //Taxonomy function.
@@ -210,16 +212,30 @@ public class Option {
         options.addOption("tol","tolerance",true,"The missing value allowed in the UMI code.(The default value is 2.)");
         options.addOption("out","out_file",true,"The output file path and name.");      
             //Merge function.
-        options.addOption("inf","in_files",true,"To read the fastq files from a file.");
+        options.addOption("Merge","merge",false,"To Merge the COMPSRA annotation files.");
+        options.addOption("inf","in_files",true,"To read the annotaion files from a file.");
         options.addOption("out","out_file",true,"The output file path and name.");
         options.addOption("id","id_column",true,"The column of molecular/species name. (Start from 0)");
         options.addOption("count","count_column",true,"The column of read count. (Start from 0)");
             //Build built-in database.
-        options.addOption("build","build_db",false,"Build COMPSRA built-in database.");
+        options.addOption("Build","build_db",false,"Build COMPSRA built-in database.");
         options.addOption("in","input",true,"Annotation files for small RNAs, such as GFF3.");
         options.addOption("db","target_db",true,"The name of annotation databae, such as miRBase.");
         options.addOption("key","key_identifier",true,"The code registered in database_record.obj. ");
         options.addOption("out","output",true,"The full name of the output obj file. This name should be ended with .obj.");
+            //Track Reads.
+        options.addOption("TrackRead","Track_Read",false,"Track the reads for annotations.");
+        options.addOption("inf","in_files",true,"To read the detailed files from a file list.");
+        options.addOption("out","out_file",true,"The output file path and name.");
+        options.addOption("type","type_rna",true,"Give the order of small RNA type and this should be consistent with the order of input file list. (e.g.:miRNA,piRNA,snRNA,snoRNA,tRNA)");
+        options.addOption("ku","keep_unique",false,"Keep the reads with unique annotation. (The default value is false.)");
+        options.addOption("bc","blank_character",true,"Set the character to represent the blank annotation. (The default value is NA.)");
+            //Build Mutant Database for ASE Analysis. 
+        options.addOption("BMDB","build_mutant_db",false,"Build Mutant Database for ASE Analysis.");
+        options.addOption("fa","fasta",true,"Read in miRNA sequences from fasta file. (You can download from miRBase.)");
+        options.addOption("vcf", "vcf_input", true, "Give SNP information from genome sequencing.");
+        options.addOption("gff3","GFF3",true,"Define the miRNA region in genome. (You can download from miRBase)");
+        options.addOption("out","output",true,"The output file is a fasta file that can be used as a reference genome. (A map file will also be created.)");
     }
     
     /**
@@ -433,7 +449,7 @@ public class Option {
                     fa.strOut = comm.getOptionValue("out");
                 }
                 ptk.setTK(fa);
-            } else if (comm.hasOption("merge")) {
+            } else if (comm.hasOption("Merge")) {
                 Merge merge = new Merge();
                 if (comm.hasOption("inf")) {
                     merge.strFile = comm.getOptionValue("inf");
@@ -448,7 +464,7 @@ public class Option {
                     merge.intCount = Integer.valueOf(comm.getOptionValue("count"));
                 }
                 ptk.setTK(merge);
-            }else if(comm.hasOption("build")){
+            }else if(comm.hasOption("BuildDB")){
                 BuildDB bdb=new BuildDB();
                 if(comm.hasOption("in")){
                     bdb.strIn=comm.getOptionValue("in");
@@ -463,6 +479,39 @@ public class Option {
                     bdb.strKey=comm.getOptionValue("key");
                 }
                 ptk.setTK(bdb);
+            }else if(comm.hasOption("TrackRead")){
+                TrackRead trd=new TrackRead();
+                if(comm.hasOption("inf")){
+                    trd.strFileIn=comm.getOptionValue("inf");
+                }
+                if(comm.hasOption("out")){
+                    trd.strFileOut=comm.getOptionValue("out");
+                }
+                if(comm.hasOption("type")){
+                    trd.strRNAClass=comm.getOptionValue("type");
+                }
+                if(comm.hasOption("ku")){
+                    trd.keepUnique=true;
+                }
+                if(comm.hasOption("bc")){
+                    trd.strBlank=comm.getOptionValue("bc");
+                }
+                ptk.setTK(trd);
+            } else if(comm.hasOption("BMDB")){
+                BuildMutantDB bmdb=new BuildMutantDB();
+                if(comm.hasOption("fa")){
+                    bmdb.strFa=comm.getOptionValue("fa");
+                }
+                if(comm.hasOption("vcf")){
+                    bmdb.strVCF=comm.getOptionValue("vcf");
+                }
+                if(comm.hasOption("gff3")){
+                    bmdb.strGFF3=comm.getOptionValue("gff3");
+                }
+                if(comm.hasOption("out")){
+                    bmdb.strOut=comm.getOptionValue("out");
+                }
+                ptk.setTK(bmdb);                
             }
             return ptk;
         }        
@@ -486,8 +535,7 @@ public class Option {
             System.out.println("Input Error! No file is set.");
             return null;
         }
-        
-        
+          
         if(comm.hasOption("out")){
             comParam.setOutput(comm.getOptionValue("out"));
         }else{
@@ -658,6 +706,9 @@ public class Option {
             }
             if(comm.hasOption("aumi")){
                 ann.useUMI=true;
+            }
+            if(comm.hasOption("ad")){
+                ann.needDetail=true;
             }
             
         } else {

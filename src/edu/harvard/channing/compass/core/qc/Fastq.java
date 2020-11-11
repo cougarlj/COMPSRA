@@ -88,21 +88,42 @@ public class Fastq implements Callable{
         if(bosOutputs==null) return false;
         
         Read read;
-        while((read=getRead(brInput))!=null){
-            if(qc.boolRmAdapter)    read.rmAdapter3prim(qc.strRmAdapter);
-            if(qc.boolRmBias)   read.rmBias(qc.intRmBias);      
+        while ((read = getRead(brInput)) != null) {
+            try {
+                if (qc.boolRmAdapter) {
+                    read.rmAdapter3prim(qc.strRmAdapter);
+                }
+                if (qc.boolRmBias) {
+                    read.rmBias(qc.intRmBias);
+                }
 
-            if(qc.boolRmQualityHead)    read.rmQualityHead(qc.intRmQualityHead);
-            if(qc.boolRmQualityTail)    read.rmQualityTail(qc.intRmQualityTail);
-            if(qc.boolRmQualityRead)    read.rmQualityRead(qc.intRmQualityRead);     
+                if (qc.boolRmQualityHead) {
+                    read.rmQualityHead(qc.intRmQualityHead);
+                }
+                if (qc.boolRmQualityTail) {
+                    read.rmQualityTail(qc.intRmQualityTail);
+                }
+                if (qc.boolRmQualityRead) {
+                    read.rmQualityRead(qc.intRmQualityRead);
+                }
 
-            if(qc.boolRmBaseHead)   read.rmBaseHead(qc.intRmBaseHead);
-            if(qc.boolRmBaseTail)   read.rmBaseTail(qc.intRmBaseTail);
-            if(qc.boolRmLengthRead)   read.rmLengthRead(strRange);        
-            
-            this.hmpReadLength.put(read.getLength(), hmpReadLength.get(read.getLength())+1);
-            
-            this.setRead(read,bosOutputs);           
+                if (qc.boolRmBaseHead) {
+                    read.rmBaseHead(qc.intRmBaseHead);
+                }
+                if (qc.boolRmBaseTail) {
+                    read.rmBaseTail(qc.intRmBaseTail);
+                }
+                if (qc.boolRmLengthRead) {
+                    read.rmLengthRead(strRange);
+                }
+
+                this.hmpReadLength.put(read.getLength(), hmpReadLength.get(read.getLength()) + 1);
+
+                this.setRead(read, bosOutputs);
+            } catch (Exception ex) {
+                LOG.error(ex.getMessage());
+                LOG.error("Read Error:"+read.strRead[0]+" removed!");
+            }
         }
         
         this.reportQC();
@@ -536,9 +557,9 @@ public class Fastq implements Callable{
 //        qc.boolRmBaseTail=true;
 //        qc.intRmBaseTail=16;
         qc.boolRmLengthRead=true;
-        qc.strRmLengthRead="8,17";
-        FileRecord frd=new FileRecord("E:\\01Work\\miRNA\\data\\13Samples_Batch\\raw_data\\HBRNA_AGTCAA_L001_R1.fastq.gz");
-        frd.setOutput("E:\\01Work\\miRNA\\project\\COMPASS\\output\\Test");
+        qc.strRmLengthRead="16,30";
+        FileRecord frd=new FileRecord("E:\\01Work\\miRNA\\project\\COMPSRA\\test\\test2.fastq.gz");
+        frd.setOutput("E:\\01Work\\miRNA\\project\\COMPSRA\\test\\test2");
         frd.setOutput();
         Fastq fq1=new Fastq(frd,qc);
 //        Fastq fq2=new Fastq("E:\\01Work\\miRNA\\data\\13Samples_Batch\\raw_data\\S-001570897_GCCAAT_L002_R1.fastq.gz",qc);

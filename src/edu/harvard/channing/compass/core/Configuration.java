@@ -74,7 +74,9 @@ public final class Configuration {
     public static HashMap<String, String> OTHERS = new HashMap();
     public static HashMap<Character, Integer> BASEORDER=new HashMap();
     public static HashMap<Integer, Character> BASEORDERREV=new HashMap();
-    public static HashMap<String, String> REF=new HashMap();         
+    public static HashMap<Character,Character> CBP=new HashMap();
+    public static HashMap<String, String> REF=new HashMap();     
+    public static HashMap<String,String> SEQ=new HashMap();
 
     public static int N_CPU;
     public static String strCurrDir;
@@ -210,6 +212,10 @@ public final class Configuration {
         //Set REF
         REF.put("hg38", PREDB+"/hg38.cps");
         REF.put("hg38.cps", DB_REF+"/hg38.fa.gz");
+        
+        //Set Sequence Reference
+        SEQ.put("miRBase_v21", DB+"/miRBase/miRBase_mature_v21.fa.gz");
+        SEQ.put("miRBase_v22", DB+"/miRBase/miRBase_mature_v22.fa.gz");
 
         //Set UCSC_CONTIG_hg38       
         UCSC_CONTIG.put("chr1", "chr1");
@@ -286,6 +292,16 @@ public final class Configuration {
         BASEORDERREV.put(4,'N');
         BASEORDERREV.put(-1,'.');
         
+        //Set Complementary base pairs
+        CBP.put('A', 'T');
+        CBP.put('T', 'A');
+        CBP.put('G', 'C');       
+        CBP.put('C', 'G');
+        CBP.put('a', 't');
+        CBP.put('t', 'a');
+        CBP.put('g', 'c');       
+        CBP.put('c', 'g');        
+        
         //Set Other information.
         OTHERS.put("piRBaseID_hg.txt", DB + "/piRBase/piRBaseID.txt");
     }
@@ -326,7 +342,7 @@ public final class Configuration {
     public void showModule() {
         System.out.println("\n+++++++++++++++++++++++++++++++");
         System.out.println("+            COMPSRA          +");
-        System.out.println("+     (V1.0.1 2020-06-26)     +");
+        System.out.println("+     (V1.0.2 2020-07-03)     +");
         System.out.println("+  rejia@channing.harvard.edu +");
         System.out.println("+++++++++++++++++++++++++++++++\n");
     }
@@ -382,8 +398,9 @@ public final class Configuration {
         DOWNLOAD.put("hg19.fa.gz", "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz");
 //        DOWNLOAD.put("hg38.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/hg38.fa.gz");
         DOWNLOAD.put("hg38.fa.gz", "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz");
-        DOWNLOAD.put("mm9.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/mm9.fa.gz");
-        DOWNLOAD.put("mm10.fa.gz", DOWNLOAD_HOMEPAGE+DOWNLOAD_BUNDLE_VERSION+"/plug/star/mm10.fa.gz");
+        DOWNLOAD.put("mm9.fa.gz", "ftp://hgdownload.soe.ucsc.edu/goldenPath/mm9/bigZips/mm9.fa.gz");
+        DOWNLOAD.put("mm10.fa.gz", "ftp://hgdownload.soe.ucsc.edu/goldenPath/mm10/bigZips/mm10.fa.gz");
+        DOWNLOAD.put("mm39.fa.gz", "ftp://hgdownload.soe.ucsc.edu/goldenPath/mm39/bigZips/mm39.fa.gz");
         DOWNLOAD.put("rn5.fa.gz", "ftp://hgdownload.soe.ucsc.edu/goldenPath/rn5/bigZips/rn5.fa.gz");
         DOWNLOAD.put("rn6.fa.gz", "ftp://hgdownload.soe.ucsc.edu/goldenPath/rn6/bigZips/rn6.fa.gz");
         

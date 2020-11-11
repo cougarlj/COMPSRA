@@ -28,6 +28,7 @@ public abstract class Annotator implements Callable {
     public boolean needBAMOutput=false;
     public boolean boolShowUnAnn=false;
     public boolean useUMI=false;
+    public boolean needDetail=false;
     
     public void setInput(FileRecord frd){
         this.frd=frd;
