@@ -3,10 +3,10 @@ COMPSRA: a COMprehensive Platform for Small RNA-seq data AnalySis (v1.0)
 
 ## 0 Release Note
 
-### COMPSRA V1.0.1 (2020-06-28)
-
-- **Add prebuilt miRNA database for Rattus norvegicus.**
-- **Support both GCA_000001895.4/rno6 and GCA_000001895.3/rno5.**
+### COMPSRA V1.0.3 (2020-11-11)
+- **Fix the bug for downloading mouse reference genome**
+    
+    e.g. java -jar COMPSRA.jar -tk -dr -ck star_mm10
 
 ### COMPSRA V1.0.2 (2020-07-03)
 
@@ -15,6 +15,12 @@ COMPSRA: a COMprehensive Platform for Small RNA-seq data AnalySis (v1.0)
     e.g. java -jar COMPSRA.jar -tk -dr -ck miRNA_rno6
 
     e.g. java -jar COMPSRA.jar -tk -dr -ck star_rno6
+
+### COMPSRA V1.0.1 (2020-06-28)
+
+- **Add prebuilt miRNA database for Rattus norvegicus.**
+- **Support both GCA_000001895.4/rno6 and GCA_000001895.3/rno5.**
+
 
 ## 1 Introduction
 
